@@ -5,6 +5,7 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.location.Location;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -17,6 +18,12 @@ import java.util.List;
 
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
+import android.widget.Toast;
+
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationRequest;
 
 public class SensorDisplay extends AppCompatActivity implements SensorEventListener {
 
@@ -115,7 +122,7 @@ public class SensorDisplay extends AppCompatActivity implements SensorEventListe
         // Many sensors return 3 values, one for each axis.
         String sensorName = event.sensor.getName();
         Log.i(TAG, "Sensor: " + sensorName);
-        Log.i(TAG, "Timestamp: " + event.timestamp + " Values: " + event.values);
+        Log.i(TAG, "Timestamp: " + event.timestamp);
         TextView sensor = (TextView)sensorTextViews.get(sensorName);
 
         if (sensor != null){
@@ -132,6 +139,7 @@ public class SensorDisplay extends AppCompatActivity implements SensorEventListe
         for (Sensor s: deviceSensors){
             mSensorManager.registerListener(this, s, SensorManager.SENSOR_DELAY_NORMAL);
         }
+
     }
 
     @Override

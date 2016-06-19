@@ -6,4 +6,10 @@
     <string name="requests">Requests</string>
     <string name="sensor_display">Display Sensors</string>
 
+    <string name="latitude_label">Latitude</string>
+    <string name="longitude_label">Longitude</string>
+
+    <string name="no_location_detected">No location detected</string>
+    <string name="permission_denied">Permission has not been granted for this service</string>
+
 </resources>
