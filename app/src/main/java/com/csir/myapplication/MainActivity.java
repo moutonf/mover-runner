@@ -22,4 +22,9 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(this, SensorDisplay.class);
         this.startActivity(intent);
     }
+
+    public void getLocation(View view) {
+        Intent intent = new Intent(this, FindLocation.class);
+        this.startActivity(intent);
+    }
 }

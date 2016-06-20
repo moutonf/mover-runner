@@ -5,6 +5,7 @@
     <string name="title_activity_home">Home</string>
     <string name="requests">Requests</string>
     <string name="sensor_display">Display Sensors</string>
+    <string name="location">Get location</string>
 
     <string name="latitude_label">Latitude</string>
     <string name="longitude_label">Longitude</string>

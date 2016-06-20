@@ -25,6 +25,14 @@
         android:text="@string/requests"
         android:onClick="getRequests" />
 
+    <Button
+        android:id="@+id/location"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:text="@string/location"
+        android:onClick="getLocation" />
+
+
 
 
 </LinearLayout>
