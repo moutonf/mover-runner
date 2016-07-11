@@ -9,12 +9,9 @@ import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.location.LocationSettingsRequest;
-import com.google.android.gms.location.LocationSettingsResult;
 
 import java.text.DateFormat;
 import java.util.Date;
@@ -33,12 +30,10 @@ public class FindLocation extends AppCompatActivity implements GoogleApiClient.C
         /**
          * Represents a geographical location.
          */
-        protected Location mLastLocation;
-
-        protected String mLatitudeLabel;
-        protected String mLongitudeLabel;
-        protected TextView mLatitudeText;
-        protected TextView mLongitudeText;
+        protected Location mCurrentLocation;
+        private Location mPreviousLocation;
+        protected String mLatitudeLabel, mLongitudeLabel,mUpdateTimeLabel,mSpeedLabel, mDistanceLabel;
+        protected TextView mLatitudeText,mLongitudeText,mSpeedText, mDistanceText ;
 
         @Override
         public void onCreate(Bundle savedInstanceState) {
@@ -47,9 +42,14 @@ public class FindLocation extends AppCompatActivity implements GoogleApiClient.C
 
             mLatitudeLabel = getResources().getString(R.string.latitude_label);
             mLongitudeLabel = getResources().getString(R.string.longitude_label);
+            mUpdateTimeLabel = getResources().getString(R.string.update_time_label);
+            mSpeedLabel = getResources().getString(R.string.speed_label);
+            mDistanceLabel = getResources().getString(R.string.distance_label);
+            mDistanceText= (TextView) findViewById((R.id.distance_text));
             mLatitudeText = (TextView) findViewById((R.id.latitude_text));
             mLongitudeText = (TextView) findViewById((R.id.longitude_text));
             mLastUpdateTimeText = (TextView) findViewById((R.id.last_update_time));
+            mSpeedText = (TextView) findViewById((R.id.speed_text));
             mRequestingLocationUpdates = true;
 
             buildGoogleApiClient();
@@ -112,16 +112,12 @@ public class FindLocation extends AppCompatActivity implements GoogleApiClient.C
         // updates. Gets the best and most recent location currently available, which may be null
         // in rare cases when a location is not available.
         try{
-            mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-            if (mLastLocation != null) {
-                mLatitudeText.setText(String.format("%s: %f", mLatitudeLabel,
-                        mLastLocation.getLatitude()));
-                mLongitudeText.setText(String.format("%s: %f", mLongitudeLabel,
-                        mLastLocation.getLongitude()));
+
+            mCurrentLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+            if (mCurrentLocation != null) {
+                updateUI();
             } else {
                 Toast.makeText(this, R.string.no_location_detected, Toast.LENGTH_LONG).show();
-
-
             }
 
             if (mRequestingLocationUpdates) {
@@ -166,23 +162,43 @@ public class FindLocation extends AppCompatActivity implements GoogleApiClient.C
     private LocationRequest mLocationRequest;
     protected void createLocationRequest() {
         mLocationRequest = new LocationRequest();
-        mLocationRequest.setInterval(10000);
+        mLocationRequest.setInterval(LOCATION_INTERVAL); //10 seconds
         mLocationRequest.setFastestInterval(5000);
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+    }
+    final private int LOCATION_INTERVAL = 10000; //10 seconds
+    public double calculateSpeed(Double distance){
+
+        return ((60000 / LOCATION_INTERVAL) * distance) * 60; //distance travelled in 1 minute * 60 = distance/hr
     }
 
     String mLastUpdateTime;
     @Override
     public void onLocationChanged(Location location) {
-        mLastLocation = location;
+        mPreviousLocation = mCurrentLocation;
+        mCurrentLocation = location;
         mLastUpdateTime = DateFormat.getTimeInstance().format(new Date());
         updateUI();
     }
     TextView mLastUpdateTimeText;
     private void updateUI() {
-        mLatitudeText.setText(String.valueOf(mLastLocation.getLatitude()));
-        mLongitudeText.setText(String.valueOf(mLastLocation.getLongitude()));
+
+        double distance = mPreviousLocation!=null?mCurrentLocation.distanceTo(mPreviousLocation):0.0;
+        double speed = calculateSpeed(distance);
+        mLatitudeText.setText(String.format("%s: %f", mLatitudeLabel,
+                mCurrentLocation.getLatitude()));
+        mLongitudeText.setText(String.format("%s: %f", mLongitudeLabel,
+                mCurrentLocation.getLongitude()));
+        mLastUpdateTimeText.setText(String.format("%s: %s", mUpdateTimeLabel,
+                mLastUpdateTime));
+        mSpeedText.setText(String.format("%s: %f", mSpeedLabel,
+                speed));
+        mDistanceText.setText(String.format("%s: %f", mDistanceLabel,
+                distance));
+        /*mLatitudeText.setText(String.valueOf(mCurrentLocation.getLatitude()));
+        mLongitudeText.setText(String.valueOf(mCurrentLocation.getLongitude()));
         mLastUpdateTimeText.setText(mLastUpdateTime);
+        mSpeedText.setText(String.valueOf(mCurrentLocation.getSpeed()));*/
     }
 
 

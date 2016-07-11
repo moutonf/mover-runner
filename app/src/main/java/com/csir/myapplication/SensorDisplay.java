@@ -120,6 +120,8 @@ public class SensorDisplay extends AppCompatActivity implements SensorEventListe
     public final void onSensorChanged(SensorEvent event) {
         // The light sensor returns a single value.
         // Many sensors return 3 values, one for each axis.
+        //_sensorTextView.Text = string.Format("x={0:f}, y={1:f}, y={2:f}", e.Values[0], e.Values[1], e.Values[2]);
+
         String sensorName = event.sensor.getName();
         Log.i(TAG, "Sensor: " + sensorName);
         Log.i(TAG, "Timestamp: " + event.timestamp);
