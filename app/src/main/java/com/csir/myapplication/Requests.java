@@ -11,6 +11,7 @@ import android.widget.TextView;
 /*OkHTTP classes*/
 import java.io.IOException;
 
+import okhttp3.FormBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -66,12 +67,17 @@ public class Requests extends AppCompatActivity {
         }
 
     }
-
-    String post(String url, String json) throws IOException {
-        RequestBody body = RequestBody.create(JSON, json);
+    /*POST requests*/
+    /*The server currently checks id and msg arguments*/
+    String post(String url) throws IOException {
+        RequestBody formBody = new FormBody.Builder()
+                .add("id", "gavin")
+                .add("message", "this is a message from gavin")
+                .build();
+//        RequestBody body = RequestBody.create(JSON, json);
         Request request = new Request.Builder()
                 .url(url)
-                .post(body)
+                .post(formBody)
                 .build();
         Response response = client.newCall(request).execute();
         return response.body().string();
@@ -81,7 +87,8 @@ public class Requests extends AppCompatActivity {
         String response;
         try {
         //MUST BUILD A JSON
-         response=  post("http://moutonf.co.za:5000/post-api","");
+            response=  post("http://moutonf.co.za:5000/post-api");
+            txtView.append(response);
 
         }catch(IOException ex){
             ex.printStackTrace();
