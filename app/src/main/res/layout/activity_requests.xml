@@ -9,16 +9,25 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.csir.myapplication.Requests">
 
+
+    <Button
+        android:id="@+id/get_button"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:text="@string/get"
+        android:onClick="getRequest" />
+    <Button
+        android:id="@+id/post_button"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:text="@string/post"
+        android:onClick="postRequest" />
+
+
     <TextView
         android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         />
-    <Button
-        android:id="@+id/button_id"
-        android:layout_height="wrap_content"
-        android:layout_width="wrap_content"
-        android:text="@string/get"
-        android:onClick="load" />
 
 </LinearLayout>

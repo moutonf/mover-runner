@@ -2,6 +2,7 @@
     <string name="app_name">MOVER</string>
 
     <string name="get">GET</string>
+    <string name="post">POST</string>
     <string name="title_activity_home">Home</string>
     <string name="requests">Requests</string>
     <string name="sensor_display">Display Sensors</string>
