@@ -21,12 +21,15 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.text.DateFormat;
 import java.util.Date;
+import java.util.GregorianCalendar;
 
 public class FindLocation extends AppCompatActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener, LocationListener {
 
         protected static final String TAG = "MOVER_LOCATION_SERVICE";
         private GoogleMap mMap;
+        private GregorianCalendar calendar;
+        private boolean mapReady;
         /**
          * Provides the entry point to Google Play services.
          */
@@ -44,6 +47,10 @@ public class FindLocation extends AppCompatActivity implements OnMapReadyCallbac
             super.onCreate(savedInstanceState);
             setContentView(R.layout.activity_find_location);
 
+            calendar = new GregorianCalendar();
+            mapReady = false;
+
+            /*DISPLAY LABELS AND TEXT BOXES*/
             mLatitudeLabel = getResources().getString(R.string.latitude_label);
             mLongitudeLabel = getResources().getString(R.string.longitude_label);
             mUpdateTimeLabel = getResources().getString(R.string.update_time_label);
@@ -188,6 +195,9 @@ public class FindLocation extends AppCompatActivity implements OnMapReadyCallbac
         mCurrentLocation = location;
         mLastUpdateTime = DateFormat.getTimeInstance().format(new Date());
         updateUI();
+        if (mapReady){
+            updateMapLocation();
+        }
     }
     TextView mLastUpdateTimeText;
     private void updateUI() {
@@ -204,22 +214,31 @@ public class FindLocation extends AppCompatActivity implements OnMapReadyCallbac
                 speed));
         mDistanceText.setText(String.format("%s: %f", mDistanceLabel,
                 distance));
-        /*mLatitudeText.setText(String.valueOf(mCurrentLocation.getLatitude()));
-        mLongitudeText.setText(String.valueOf(mCurrentLocation.getLongitude()));
-        mLastUpdateTimeText.setText(mLastUpdateTime);
-        mSpeedText.setText(String.valueOf(mCurrentLocation.getSpeed()));*/
     }
 
     /*GOOGLE MAPS*/
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        mapReady = true;
 
         // Add a marker in Sydney and move the camera
-        LatLng sydney = new LatLng(-34, 151);
-        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
-    }
 
+        updateMapLocation();
+    }
+    public void updateMapLocation(){
+        LatLng location;
+
+        if (mCurrentLocation != null){
+            location = new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude());
+        }else{
+            location = new LatLng(-34, 151);
+        }
+
+        mMap.addMarker(new MarkerOptions().position(location).title(
+                String.format("%s", new Date().getTime())
+        ));
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(location));
+    }
 
 }
