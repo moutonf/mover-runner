@@ -32,6 +32,14 @@
         android:text="@string/location"
         android:onClick="getLocation" />
 
+    <Button
+        android:id="@+id/maps"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:text="@string/map"
+        android:onClick="getMap" />
+
+
 
 
 

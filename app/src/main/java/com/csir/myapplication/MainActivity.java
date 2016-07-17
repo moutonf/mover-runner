@@ -6,7 +6,7 @@ import android.os.Bundle;
 import android.view.View;
 
 public class MainActivity extends AppCompatActivity {
-
+    Intent intent;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -14,17 +14,22 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void getRequests(View view) {
-        Intent intent = new Intent(this, Requests.class);
+         intent = new Intent(this, Requests.class);
         this.startActivity(intent);
     }
 
     public void getSensors(View view) {
-        Intent intent = new Intent(this, SensorDisplay.class);
+         intent = new Intent(this, SensorDisplay.class);
         this.startActivity(intent);
     }
 
     public void getLocation(View view) {
-        Intent intent = new Intent(this, FindLocation.class);
+         intent = new Intent(this, FindLocation.class);
+        this.startActivity(intent);
+    }
+
+    public void getMap(View view) {
+        intent = new Intent(this, MapsActivity.class);
         this.startActivity(intent);
     }
 }

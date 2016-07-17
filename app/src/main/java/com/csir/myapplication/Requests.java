@@ -1,5 +1,6 @@
 package com.csir.myapplication;
 
+import android.net.Uri;
 import android.os.StrictMode;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -10,6 +11,7 @@ import android.widget.TextView;
 
 /*OkHTTP classes*/
 import java.io.IOException;
+import java.net.URL;
 
 import okhttp3.FormBody;
 import okhttp3.OkHttpClient;
@@ -29,6 +31,14 @@ public class Requests extends AppCompatActivity {
 
     public static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
     private static final String TAG = "CONNECTION";
+
+    final String POST_BASE_URL =
+            "http://moutonf.co.za:5000/post-api";
+    final String GET_BASE_URL =
+            "http://moutonf.co.za:5000/get-api";
+
+    final String ID_PARAM = "id";
+    final String MESSAGE_PARAM = "message";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,7 +70,14 @@ public class Requests extends AppCompatActivity {
     public void getRequest(View view) {
         String response;
         try {
-            response = run("http://moutonf.co.za:5000/get-api");
+
+            Uri builtUri = Uri.parse(GET_BASE_URL)
+                    .buildUpon()
+                    .appendQueryParameter(ID_PARAM, "get-id")
+                    .appendQueryParameter(MESSAGE_PARAM, "get-message")
+                    .build();
+
+            response = run(builtUri.toString());
             txtView.append(response);
         }catch(IOException ex){
             ex.printStackTrace();

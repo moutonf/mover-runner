@@ -8,6 +8,8 @@
     <string name="requests">Requests</string>
     <string name="sensor_display">Display Sensors</string>
     <string name="location">Get location</string>
+    <string name="map">Show map</string>
+
 
     <!--LOCATION SERVICE LABELS-->
     <string name="latitude_label">Latitude</string>
@@ -18,5 +20,8 @@
     <string name="no_location_detected">No location detected</string>
 
     <string name="permission_denied">Permission has not been granted for this service</string>
+    <!--SENSOR LABELS-->
+    <string name="accident_detected">An accident has occurred</string>
+    <string name="title_activity_maps">Map</string>
 
 </resources>

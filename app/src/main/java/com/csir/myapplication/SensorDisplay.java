@@ -28,7 +28,7 @@ import com.google.android.gms.location.LocationRequest;
 public class SensorDisplay extends AppCompatActivity implements SensorEventListener {
 
     private SensorManager mSensorManager;
-    private static final String TAG = "SENSOR";
+    private static final String TAG = "MOVER_SENSOR";
     private TextView sensorInfo;
 
     private Sensor mAccelerometer;
@@ -67,22 +67,33 @@ public class SensorDisplay extends AppCompatActivity implements SensorEventListe
         deviceSensors = new ArrayList<Sensor>();
         //A list of all potentially useful sensors
         if (mAccelerometer != null){
+            Log.i(TAG, "Acceleromter added");
             deviceSensors.add(mAccelerometer);
         }
         if (mGyro != null){
+            Log.i(TAG, "Gyro sensor added");
+
             deviceSensors.add(mGyro);
         }
         if (mLight != null){
+            Log.i(TAG, "Light sensor added");
+
             deviceSensors.add(mLight);
         }
 
         if (mLinearAcceleration != null){
+            Log.i(TAG, "Linear Acceleration sensor added");
+
             deviceSensors.add(mLinearAcceleration);
         }
         if (mRotationVector != null){
+            Log.i(TAG, "Roation Vector sensor added");
+
             deviceSensors.add(mRotationVector);
         }
         if (mSignificantMotion != null){
+            Log.i(TAG, "Significant Motion sensor added");
+
             deviceSensors.add(mSignificantMotion);
         }
 
@@ -121,13 +132,25 @@ public class SensorDisplay extends AppCompatActivity implements SensorEventListe
         // The light sensor returns a single value.
         // Many sensors return 3 values, one for each axis.
         //_sensorTextView.Text = string.Format("x={0:f}, y={1:f}, y={2:f}", e.Values[0], e.Values[1], e.Values[2]);
-
+        float[] rotationVectors;
+//        mSensorManager.getOrientation(,rotationVectors);
         String sensorName = event.sensor.getName();
         Log.i(TAG, "Sensor: " + sensorName);
         Log.i(TAG, "Timestamp: " + event.timestamp);
         TextView sensor = (TextView)sensorTextViews.get(sensorName);
 
         if (sensor != null){
+            if (sensorName.toUpperCase().equals("ACCELEROMETER")){
+
+                // Remove the gravity contribution with the high-pass filter.
+             /*   linear_acceleration[0] = event.values[0] - gravity[0];
+                linear_acceleration[1] = event.values[1] - gravity[1];
+                linear_acceleration[2] = event.values[2] - gravity[2];
+*/
+                if (event.values[0] > 5 ||event.values[1]> 5 ||event.values[2] > 5 ){
+//                    Toast.makeText(this, R.string.accident_detected, Toast.LENGTH_LONG).show();
+                }
+            }
             sensor.setText(String.valueOf(sensorName +": "));
             for (int i = 0; i < event.values.length; i++){
                 sensor.append(String.valueOf(event.values[i] + " "));
