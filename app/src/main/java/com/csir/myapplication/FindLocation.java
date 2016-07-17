@@ -12,21 +12,25 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.text.DateFormat;
 import java.util.Date;
 
-public class FindLocation extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks,
+public class FindLocation extends AppCompatActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener, LocationListener {
 
         protected static final String TAG = "MOVER_LOCATION_SERVICE";
-
-
+        private GoogleMap mMap;
         /**
          * Provides the entry point to Google Play services.
          */
         protected GoogleApiClient mGoogleApiClient;
-
         /**
          * Represents a geographical location.
          */
@@ -51,6 +55,11 @@ public class FindLocation extends AppCompatActivity implements GoogleApiClient.C
             mLastUpdateTimeText = (TextView) findViewById((R.id.last_update_time));
             mSpeedText = (TextView) findViewById((R.id.speed_text));
             mRequestingLocationUpdates = true;
+
+            // Obtain the SupportMapFragment and get notified when the map is ready to be used.
+            SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                    .findFragmentById(R.id.map);
+            mapFragment.getMapAsync(this);
 
             buildGoogleApiClient();
         }
@@ -199,6 +208,17 @@ public class FindLocation extends AppCompatActivity implements GoogleApiClient.C
         mLongitudeText.setText(String.valueOf(mCurrentLocation.getLongitude()));
         mLastUpdateTimeText.setText(mLastUpdateTime);
         mSpeedText.setText(String.valueOf(mCurrentLocation.getSpeed()));*/
+    }
+
+    /*GOOGLE MAPS*/
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        mMap = googleMap;
+
+        // Add a marker in Sydney and move the camera
+        LatLng sydney = new LatLng(-34, 151);
+        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
     }
 
 

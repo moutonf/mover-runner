@@ -28,8 +28,4 @@ public class MainActivity extends AppCompatActivity {
         this.startActivity(intent);
     }
 
-    public void getMap(View view) {
-        intent = new Intent(this, MapsActivity.class);
-        this.startActivity(intent);
-    }
 }
