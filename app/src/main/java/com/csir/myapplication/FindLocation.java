@@ -1,6 +1,8 @@
 package com.csir.myapplication;
 
+import android.content.pm.PackageManager;
 import android.location.Location;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -16,6 +18,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
@@ -220,6 +223,13 @@ public class FindLocation extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        mMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
+        mMap.moveCamera(CameraUpdateFactory.zoomBy(15));
+        if ( ContextCompat.checkSelfPermission( this, android.Manifest.permission.ACCESS_COARSE_LOCATION ) == PackageManager.PERMISSION_GRANTED ) {
+
+            mMap.setMyLocationEnabled(true);
+        }
+
         mapReady = true;
 
         // Add a marker in Sydney and move the camera
@@ -235,9 +245,12 @@ public class FindLocation extends AppCompatActivity implements OnMapReadyCallbac
             location = new LatLng(-34, 151);
         }
 
-        mMap.addMarker(new MarkerOptions().position(location).title(
-                String.format("%s", new Date().getTime())
-        ));
+        mMap.addMarker(new MarkerOptions()
+                .position(location)
+                .title(String.format("%s", new Date().getTime()))
+                .alpha(0.5f)
+                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
+        );
         mMap.moveCamera(CameraUpdateFactory.newLatLng(location));
     }
 
