@@ -29,14 +29,16 @@ import com.google.android.gms.maps.model.PolylineOptions;
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.Locale;
 
 public class FindLocation extends AppCompatActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener, LocationListener {
 
         protected static final String TAG = "MOVER_LOCATION_SERVICE";
         private GoogleMap mMap;
-        private GregorianCalendar calendar;
         private boolean mapReady;
+
+        private Locale deviceLocale;
         /**
          * Provides the entry point to Google Play services.
          */
@@ -54,7 +56,6 @@ public class FindLocation extends AppCompatActivity implements OnMapReadyCallbac
             super.onCreate(savedInstanceState);
             setContentView(R.layout.activity_find_location);
 
-            calendar = new GregorianCalendar();
             mapReady = false;
 
             /*DISPLAY LABELS AND TEXT BOXES*/
@@ -69,6 +70,7 @@ public class FindLocation extends AppCompatActivity implements OnMapReadyCallbac
             mLastUpdateTimeText = (TextView) findViewById((R.id.last_update_time));
             mSpeedText = (TextView) findViewById((R.id.speed_text));
             mRequestingLocationUpdates = true;
+            deviceLocale = Locale.getDefault();
 
             // Obtain the SupportMapFragment and get notified when the map is ready to be used.
             SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -208,18 +210,17 @@ public class FindLocation extends AppCompatActivity implements OnMapReadyCallbac
     }
     TextView mLastUpdateTimeText;
     private void updateUI() {
-
         double distance = mPreviousLocation!=null?mCurrentLocation.distanceTo(mPreviousLocation):0.0;
         double speed = calculateSpeed(distance);
-        mLatitudeText.setText(String.format("%s: %f", mLatitudeLabel,
+        mLatitudeText.setText(String.format(deviceLocale,"%s: %f", mLatitudeLabel,
                 mCurrentLocation.getLatitude()));
-        mLongitudeText.setText(String.format("%s: %f", mLongitudeLabel,
+        mLongitudeText.setText(String.format(deviceLocale,"%s: %f", mLongitudeLabel,
                 mCurrentLocation.getLongitude()));
-        mLastUpdateTimeText.setText(String.format("%s: %s", mUpdateTimeLabel,
+        mLastUpdateTimeText.setText(String.format(deviceLocale,"%s: %s", mUpdateTimeLabel,
                 mLastUpdateTime));
-        mSpeedText.setText(String.format("%s: %f", mSpeedLabel,
+        mSpeedText.setText(String.format(deviceLocale,"%s: %f", mSpeedLabel,
                 speed));
-        mDistanceText.setText(String.format("%s: %f", mDistanceLabel,
+        mDistanceText.setText(String.format(deviceLocale,"%s: %f", mDistanceLabel,
                 distance));
     }
 
@@ -228,7 +229,6 @@ public class FindLocation extends AppCompatActivity implements OnMapReadyCallbac
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         mMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
-        mMap.moveCamera(CameraUpdateFactory.zoomBy(15.0f));
         if ( ContextCompat.checkSelfPermission( this, android.Manifest.permission.ACCESS_COARSE_LOCATION ) == PackageManager.PERMISSION_GRANTED ) {
 
             mMap.setMyLocationEnabled(true);
@@ -236,14 +236,13 @@ public class FindLocation extends AppCompatActivity implements OnMapReadyCallbac
 
         mapReady = true;
 
-        // Add a marker in Sydney and move the camera
         updateMapLocation();
     }
 
+    float transparency = 0.5f;
+    LatLng location;
 
     public void updateMapLocation(){
-        LatLng location;
-        float transparency = 0.5f;
 
         if (mCurrentLocation != null){
 
@@ -264,11 +263,11 @@ public class FindLocation extends AppCompatActivity implements OnMapReadyCallbac
             mMap.addPolyline(new PolylineOptions()
                     .add(new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude()),
                             new LatLng(mPreviousLocation.getLatitude(), mPreviousLocation.getLongitude()))
-                    .width(2)
+                    .width(3)
                     .color(Color.BLUE));
         }
 
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(location));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location, 15));
     }
 
 }

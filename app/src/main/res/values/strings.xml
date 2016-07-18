@@ -24,4 +24,8 @@
     <string name="accident_detected">An accident has occurred</string>
     <string name="title_activity_maps">Map</string>
 
+    <!--BUTTON LABELS-->
+    <string name="start">Start</string>
+    <string name="stop">Stop</string>
+
 </resources>
