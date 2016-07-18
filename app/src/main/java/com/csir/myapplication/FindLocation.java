@@ -1,6 +1,7 @@
 package com.csir.myapplication;
 
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Location;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -20,7 +21,10 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
 
 import java.text.DateFormat;
 import java.util.Date;
@@ -224,7 +228,7 @@ public class FindLocation extends AppCompatActivity implements OnMapReadyCallbac
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         mMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
-        mMap.moveCamera(CameraUpdateFactory.zoomBy(15));
+        mMap.moveCamera(CameraUpdateFactory.zoomBy(15.0f));
         if ( ContextCompat.checkSelfPermission( this, android.Manifest.permission.ACCESS_COARSE_LOCATION ) == PackageManager.PERMISSION_GRANTED ) {
 
             mMap.setMyLocationEnabled(true);
@@ -233,13 +237,16 @@ public class FindLocation extends AppCompatActivity implements OnMapReadyCallbac
         mapReady = true;
 
         // Add a marker in Sydney and move the camera
-
         updateMapLocation();
     }
+
+
     public void updateMapLocation(){
         LatLng location;
+        float transparency = 0.5f;
 
         if (mCurrentLocation != null){
+
             location = new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude());
         }else{
             location = new LatLng(-34, 151);
@@ -247,10 +254,20 @@ public class FindLocation extends AppCompatActivity implements OnMapReadyCallbac
 
         mMap.addMarker(new MarkerOptions()
                 .position(location)
-                .title(String.format("%s", new Date().getTime()))
-                .alpha(0.5f)
+                .title(String.format("Added: %s", new Date()))
+                .alpha(transparency)
                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
         );
+
+        //draw the route
+        if (mPreviousLocation !=null){
+            mMap.addPolyline(new PolylineOptions()
+                    .add(new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude()),
+                            new LatLng(mPreviousLocation.getLatitude(), mPreviousLocation.getLongitude()))
+                    .width(2)
+                    .color(Color.BLUE));
+        }
+
         mMap.moveCamera(CameraUpdateFactory.newLatLng(location));
     }
 
