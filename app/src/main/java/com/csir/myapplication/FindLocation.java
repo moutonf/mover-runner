@@ -35,21 +35,24 @@ public class FindLocation extends AppCompatActivity implements OnMapReadyCallbac
         GoogleApiClient.OnConnectionFailedListener, LocationListener {
 
         protected static final String TAG = "MOVER_LOCATION_SERVICE";
+        private Locale deviceLocale;
+
+        /*LOCATION*/
         private GoogleMap mMap;
         private boolean mapReady;
-
-        private Locale deviceLocale;
-        /**
-         * Provides the entry point to Google Play services.
-         */
         protected GoogleApiClient mGoogleApiClient;
-        /**
-         * Represents a geographical location.
-         */
         protected Location mCurrentLocation;
         private Location mPreviousLocation;
-        protected String mLatitudeLabel, mLongitudeLabel,mUpdateTimeLabel,mSpeedLabel, mDistanceLabel;
-        protected TextView mLatitudeText,mLongitudeText,mSpeedText, mDistanceText ;
+        Boolean mRequestingLocationUpdates;
+        private LocationRequest mLocationRequest;
+        final private int LOCATION_INTERVAL = 10000; //10 seconds
+
+    float transparency = 0.5f;
+    LatLng location;
+
+    /*DISPLAY VARIABLES*/
+        protected String mLatitudeLabel, mLongitudeLabel,mUpdateTimeLabel,mSpeedLabel, mDistanceLabel,mLastUpdateTime;
+        protected TextView mLatitudeText,mLongitudeText,mSpeedText, mDistanceText,mLastUpdateTimeText ;
 
         @Override
         public void onCreate(Bundle savedInstanceState) {
@@ -57,7 +60,9 @@ public class FindLocation extends AppCompatActivity implements OnMapReadyCallbac
             setContentView(R.layout.activity_find_location);
 
             mapReady = false;
+            mRequestingLocationUpdates = true;
 
+            this.findViewById(android.R.id.content).setKeepScreenOn(true);
             /*DISPLAY LABELS AND TEXT BOXES*/
             mLatitudeLabel = getResources().getString(R.string.latitude_label);
             mLongitudeLabel = getResources().getString(R.string.longitude_label);
@@ -69,7 +74,7 @@ public class FindLocation extends AppCompatActivity implements OnMapReadyCallbac
             mLongitudeText = (TextView) findViewById((R.id.longitude_text));
             mLastUpdateTimeText = (TextView) findViewById((R.id.last_update_time));
             mSpeedText = (TextView) findViewById((R.id.speed_text));
-            mRequestingLocationUpdates = true;
+            /****************/
             deviceLocale = Locale.getDefault();
 
             // Obtain the SupportMapFragment and get notified when the map is ready to be used.
@@ -80,80 +85,99 @@ public class FindLocation extends AppCompatActivity implements OnMapReadyCallbac
             buildGoogleApiClient();
         }
 
-        /**
-         * Builds a GoogleApiClient. Uses the addApi() method to request the LocationServices API.
-         */
-    protected synchronized void buildGoogleApiClient() {
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .addApi(LocationServices.API)
-                .build();
 
-        createLocationRequest();
+    /*SET UP INTERVAL LOCATION UPDATES*/
+    protected void createLocationRequest() {
+        mLocationRequest = new LocationRequest();
+        mLocationRequest.setInterval(LOCATION_INTERVAL); //10 seconds
+        mLocationRequest.setFastestInterval(5000);
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-        mGoogleApiClient.connect();
-    }
+    /*A rough estimate of speed*/
+    public double calculateSpeed(Double distance){
 
+        return ((60000 / LOCATION_INTERVAL) * distance) * 60; //distance travelled in 1 minute * 60 = distance/hr
+    }
+    boolean start;
     @Override
-    protected void onStop() {
-        super.onStop();
-        if (mGoogleApiClient.isConnected()) {
-            mGoogleApiClient.disconnect();
+    public void onLocationChanged(Location location) {
+        /*Need the previous location for distance and route calculations*/
+        if (mCurrentLocation == null ){
+            start = true;
+        }
+        mPreviousLocation = mCurrentLocation;
+        mCurrentLocation = location;
+        mLastUpdateTime = DateFormat.getTimeInstance().format(new Date());
+        updateUI();
+        if (mapReady){
+            updateMapLocation();
         }
     }
+    double distance, speed;
+    /*Update the display headers*/
+    private void updateUI() {
+        distance = mPreviousLocation!=null?mCurrentLocation.distanceTo(mPreviousLocation):0.0;
+        speed = calculateSpeed(distance);
+        mLatitudeText.setText(String.format(deviceLocale,"%s: %f", mLatitudeLabel,
+                mCurrentLocation.getLatitude()));
+        mLongitudeText.setText(String.format(deviceLocale,"%s: %f", mLongitudeLabel,
+                mCurrentLocation.getLongitude()));
+        mLastUpdateTimeText.setText(String.format(deviceLocale,"%s: %s", mUpdateTimeLabel,
+                mLastUpdateTime));
+        mSpeedText.setText(String.format(deviceLocale,"%s: %f", mSpeedLabel,
+                speed));
+        mDistanceText.setText(String.format(deviceLocale,"%s: %f", mDistanceLabel,
+                distance));
+    }
 
+    /*GOOGLE MAPS*/
     @Override
-    public void onResume() {
-        super.onResume();
-        if (mGoogleApiClient.isConnected() && !mRequestingLocationUpdates) {
-            startLocationUpdates();
+    public void onMapReady(GoogleMap googleMap) {
+        mMap = googleMap;
+        mMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
+        if ( ContextCompat.checkSelfPermission( this, android.Manifest.permission.ACCESS_COARSE_LOCATION ) == PackageManager.PERMISSION_GRANTED ) {
+            mMap.setMyLocationEnabled(true);
         }
+        mapReady = true;
+
+    }
+    /*The main map display and update method*/
+
+
+    public void updateMapLocation(){
+        location = new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude());
+        //only add a marker if start of the trip
+        if (start){
+                    mMap.addMarker(new MarkerOptions()
+                    .position(location)
+                    .title(String.format("Added: %s", new Date()))
+                    .alpha(transparency)
+                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
+            );
+            start = false;
+        }
+
+        //draw the route
+        if (mPreviousLocation != mCurrentLocation && mPreviousLocation != null){
+            mMap.addPolyline(new PolylineOptions()
+                    .add(new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude()),
+                            new LatLng(mPreviousLocation.getLatitude(), mPreviousLocation.getLongitude()))
+                    .width(3)
+                    .color(Color.BLUE));
+        }
+        //maintain the zoom levels
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location, mMap.getCameraPosition().zoom));
     }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-        stopLocationUpdates();
-    }
-
-    protected void stopLocationUpdates() {
-        LocationServices.FusedLocationApi.removeLocationUpdates(
-                mGoogleApiClient, this);
-    }
+    /*Boring Google Maps methods*/
 
     /**
      * Runs when a GoogleApiClient object successfully connects.
      */
-    Boolean mRequestingLocationUpdates;
     @Override
     public void onConnected(Bundle connectionHint) {
-        // Provides a simple way of getting a device's location and is well suited for
-        // applications that do not require a fine-grained location and that do not need location
-        // updates. Gets the best and most recent location currently available, which may be null
-        // in rare cases when a location is not available.
-        try{
-
-            mCurrentLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-            if (mCurrentLocation != null) {
-                updateUI();
-            } else {
-                Toast.makeText(this, R.string.no_location_detected, Toast.LENGTH_LONG).show();
-            }
-
-            if (mRequestingLocationUpdates) {
-                startLocationUpdates();
-            }
-        }catch(SecurityException e){
-            Log.e(TAG,"User doesn't have location permission");
-            Toast.makeText(this, R.string.permission_denied, Toast.LENGTH_LONG).show();
-
-        }
-
+        startLocationUpdates();
     }
 
     protected void startLocationUpdates() {
@@ -182,92 +206,50 @@ public class FindLocation extends AppCompatActivity implements OnMapReadyCallbac
         Log.i(TAG, "Connection suspended");
         mGoogleApiClient.connect();
     }
+    protected synchronized void buildGoogleApiClient() {
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(LocationServices.API)
+                .build();
 
-    /*SET UP INTERVAL LOCATION UPDATES*/
-    private LocationRequest mLocationRequest;
-    protected void createLocationRequest() {
-        mLocationRequest = new LocationRequest();
-        mLocationRequest.setInterval(LOCATION_INTERVAL); //10 seconds
-        mLocationRequest.setFastestInterval(5000);
-        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-    }
-    final private int LOCATION_INTERVAL = 10000; //10 seconds
-    public double calculateSpeed(Double distance){
-
-        return ((60000 / LOCATION_INTERVAL) * distance) * 60; //distance travelled in 1 minute * 60 = distance/hr
+        createLocationRequest();
     }
 
-    String mLastUpdateTime;
     @Override
-    public void onLocationChanged(Location location) {
-        mPreviousLocation = mCurrentLocation;
-        mCurrentLocation = location;
-        mLastUpdateTime = DateFormat.getTimeInstance().format(new Date());
-        updateUI();
-        if (mapReady){
-            updateMapLocation();
-        }
-    }
-    TextView mLastUpdateTimeText;
-    private void updateUI() {
-        double distance = mPreviousLocation!=null?mCurrentLocation.distanceTo(mPreviousLocation):0.0;
-        double speed = calculateSpeed(distance);
-        mLatitudeText.setText(String.format(deviceLocale,"%s: %f", mLatitudeLabel,
-                mCurrentLocation.getLatitude()));
-        mLongitudeText.setText(String.format(deviceLocale,"%s: %f", mLongitudeLabel,
-                mCurrentLocation.getLongitude()));
-        mLastUpdateTimeText.setText(String.format(deviceLocale,"%s: %s", mUpdateTimeLabel,
-                mLastUpdateTime));
-        mSpeedText.setText(String.format(deviceLocale,"%s: %f", mSpeedLabel,
-                speed));
-        mDistanceText.setText(String.format(deviceLocale,"%s: %f", mDistanceLabel,
-                distance));
+    protected void onStart() {
+        super.onStart();
+            /*Location updates are stopped when paused*/
+        mGoogleApiClient.connect();
     }
 
-    /*GOOGLE MAPS*/
     @Override
-    public void onMapReady(GoogleMap googleMap) {
-        mMap = googleMap;
-        mMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
-        if ( ContextCompat.checkSelfPermission( this, android.Manifest.permission.ACCESS_COARSE_LOCATION ) == PackageManager.PERMISSION_GRANTED ) {
-
-            mMap.setMyLocationEnabled(true);
+    protected void onStop() {
+        super.onStop();
+            /*Don't sustain connections*/
+        if (mGoogleApiClient.isConnected()) {
+            mGoogleApiClient.disconnect();
         }
-
-        mapReady = true;
-
-        updateMapLocation();
+    }
+    @Override
+    protected void onPause() {
+        super.onPause();
+            /*Will drain battery unnecessarily*/
+        stopLocationUpdates();
     }
 
-    float transparency = 0.5f;
-    LatLng location;
-
-    public void updateMapLocation(){
-
-        if (mCurrentLocation != null){
-
-            location = new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude());
-        }else{
-            location = new LatLng(-34, 151);
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (mGoogleApiClient.isConnected() && !mRequestingLocationUpdates) {
+            startLocationUpdates();
         }
-
-        mMap.addMarker(new MarkerOptions()
-                .position(location)
-                .title(String.format("Added: %s", new Date()))
-                .alpha(transparency)
-                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
-        );
-
-        //draw the route
-        if (mPreviousLocation !=null){
-            mMap.addPolyline(new PolylineOptions()
-                    .add(new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude()),
-                            new LatLng(mPreviousLocation.getLatitude(), mPreviousLocation.getLongitude()))
-                    .width(3)
-                    .color(Color.BLUE));
-        }
-
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location, 15));
     }
+
+    protected void stopLocationUpdates() {
+        LocationServices.FusedLocationApi.removeLocationUpdates(
+                mGoogleApiClient, this);
+    }
+
 
 }

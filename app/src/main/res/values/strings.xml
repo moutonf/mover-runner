@@ -14,7 +14,7 @@
     <!--LOCATION SERVICE LABELS-->
     <string name="latitude_label">Latitude</string>
     <string name="longitude_label">Longitude</string>
-    <string name="speed_label">Speed(m/s)</string>
+    <string name="speed_label">Speed</string>
     <string name="update_time_label">Last updated</string>
     <string name="distance_label">Distance travel since last location</string>
     <string name="no_location_detected">No location detected</string>

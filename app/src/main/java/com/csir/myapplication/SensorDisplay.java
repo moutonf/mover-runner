@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -43,6 +44,8 @@ public class SensorDisplay extends AppCompatActivity implements SensorEventListe
 
     private LayoutParams lparams;
 
+    static final float LOW_PASS_ALPHA = 0.25f; // if ALPHA = 1 OR 0, no filter applies.
+    final float GRAVITY_ALPHA = 0.8f;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -107,9 +110,9 @@ public class SensorDisplay extends AppCompatActivity implements SensorEventListe
         String info;
         sensorTextViews = new HashMap<String,TextView>();
         for (Sensor s: deviceSensors){
-            info = s.toString() + " " + s.getMinDelay() + "\n";
-            Log.i(TAG, "Available: " + info );
-            sensorInfo.append(info);
+//            info = s.toString() + " " + s.getMinDelay() + "\n";
+//            Log.i(TAG, "Available: " + info );
+//            sensorInfo.append(info);
             tv = new TextView(this);
             tv.setLayoutParams(lparams);
             viewGroup.addView(tv);
@@ -124,36 +127,70 @@ public class SensorDisplay extends AppCompatActivity implements SensorEventListe
         // Do something here if sensor accuracy changes.
     }
 
+    /*Ref: https://github.com/Bhide/Low-Pass-Filter-To-Android-Sensors*/
+    //If new values are unusually larger, only a dampened output is added
+    //If new values are unusually smaller, the change is dampened
+    //Previous values with added dampened  values are returned
+    protected float[] lowPass( float[] input, float[] output ) {
+        if ( output == null ){
+                Log.d(TAG,"Setting initial pass values");
+                 return input;
+        }
+
+        for ( int i=0; i<input.length; i++ ) {
+            /*Appending a dampened value from the new inputs*/
+            output[i] = output[i] + LOW_PASS_ALPHA * (input[i] - output[i]);
+        }
+        return output;
+    }
+
+
     /*Interface method*/
     /*https://developer.android.com/reference/android/hardware/SensorEvent.html - HIGH PASS FILTER FOR GRAVITY*/
+    float [] filterValues;
+    String sensorName;
+    TextView sensor;
+    DecimalFormat f = new DecimalFormat("0.000");
 
+    float[] gravity;
     @Override
     public final void onSensorChanged(SensorEvent event) {
-        // The light sensor returns a single value.
-        // Many sensors return 3 values, one for each axis.
-        //_sensorTextView.Text = string.Format("x={0:f}, y={1:f}, y={2:f}", e.Values[0], e.Values[1], e.Values[2]);
-        float[] rotationVectors;
-//        mSensorManager.getOrientation(,rotationVectors);
-        String sensorName = event.sensor.getName();
+        /*Low-pass filter values*/
+        filterValues = lowPass(event.values.clone(), filterValues);
+
+        sensorName = event.sensor.getName();
         Log.i(TAG, "Sensor: " + sensorName);
         Log.i(TAG, "Timestamp: " + event.timestamp);
-        TextView sensor = (TextView)sensorTextViews.get(sensorName);
+
+        sensor = (TextView)sensorTextViews.get(sensorName);
+
+        double magnitude;
 
         if (sensor != null){
             if (sensorName.toUpperCase().equals("ACCELEROMETER")){
 
-                // Remove the gravity contribution with the high-pass filter.
-             /*   linear_acceleration[0] = event.values[0] - gravity[0];
-                linear_acceleration[1] = event.values[1] - gravity[1];
-                linear_acceleration[2] = event.values[2] - gravity[2];
-*/
-                if (event.values[0] > 5 ||event.values[1]> 5 ||event.values[2] > 5 ){
-//                    Toast.makeText(this, R.string.accident_detected, Toast.LENGTH_LONG).show();
+                if (gravity==null){
+                    Log.d(TAG,"Setting initial gravity values");
+
+                    gravity = filterValues;
                 }
+                /*Must reduce gravity values*/
+                gravity[0] = GRAVITY_ALPHA * gravity[0] + (1 - GRAVITY_ALPHA) * event.values[0]; //GRAVITY_ALPHA = 0.8f
+                gravity[1] = GRAVITY_ALPHA * gravity[1] + (1 - GRAVITY_ALPHA) * event.values[1];
+                gravity[2] = GRAVITY_ALPHA * gravity[2] + (1 - GRAVITY_ALPHA) * event.values[2];
+//                magnitude = Math.sqrt(
+//                        Math.pow(event.values[0],2) +
+//                        Math.pow(event.values[1],2) +
+//                        Math.pow(event.values[2],2)
+//                     );
             }
+
             sensor.setText(String.valueOf(sensorName +": "));
-            for (int i = 0; i < event.values.length; i++){
-                sensor.append(String.valueOf(event.values[i] + " "));
+            for (int i = 0; i < filterValues.length; i++){
+                sensor.append(
+                        String.valueOf(f.format(event.values[i] - gravity[i]) + " ")
+                );
+//                sensor.append(String.valueOf(event.values[i] + " "));
             }
         }
     }
