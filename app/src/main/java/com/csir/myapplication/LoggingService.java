@@ -14,29 +14,31 @@ import java.util.Date;
  * Created by GavinW on 2016-07-24.
  */
 public class LoggingService {
-
+    String LOG_TAG = "MOVER - LOGGING";
     String filename;
     File logFile;
     Context context;
     /*Filename is date and time when activity is run*/
     public LoggingService(Context context){
         this.context = context;
-        this.filename = new Date().toString();
+        this.filename = String.valueOf(new Date().getTime());
         if (isExternalStorageWritable()){
+            Log.i(LOG_TAG,"External storage used");
             logFile = new File(this.context.getExternalFilesDir(null),filename);
-
         }else{
             //internal storage
+            Log.i(LOG_TAG,"Internal storage used");
             logFile = new File(this.context.getFilesDir(), filename);
         }
+        Log.i(LOG_TAG,"Log file location: " + logFile.getAbsolutePath());
     }
     FileOutputStream outputStream;
 
-    public void writeLog(String input, String TAG){
-
+    public void writeLog(String TAG, String input){
+        String output = new Date().toString() + " " + TAG + " " + input;
         try {
             outputStream = context.openFileOutput(filename, Context.MODE_PRIVATE);
-            outputStream.write(input.getBytes());
+            outputStream.write(output.getBytes());
             outputStream.close();
         } catch (Exception e) {
             Log.e(TAG,"Log output could not write");

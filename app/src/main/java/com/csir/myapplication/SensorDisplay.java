@@ -14,6 +14,7 @@ import android.widget.TextView;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -27,7 +28,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationRequest;
 
 public class SensorDisplay extends AppCompatActivity implements SensorEventListener {
-
+    LoggingService log;
     private SensorManager mSensorManager;
     private static final String TAG = "MOVER_SENSOR";
     private TextView sensorInfo,sensorMax;
@@ -58,7 +59,7 @@ public class SensorDisplay extends AppCompatActivity implements SensorEventListe
 
         sensorInfo = (TextView) findViewById(R.id.sensor_info);
         sensorMax = (TextView) findViewById(R.id.accelerometer_max);
-
+        log = new LoggingService(this);
         sensorInfo.setText("SENSOR INFO:\n");
         viewGroup = (ViewGroup) ((ViewGroup) this.findViewById(android.R.id.content)).getChildAt(0);
 
@@ -114,6 +115,8 @@ public class SensorDisplay extends AppCompatActivity implements SensorEventListe
             Log.d(TAG,"Adding textview " + s.getName());
             sensorTextViews.put(s.getName(), tv);
         }
+
+        date1 = new Date();
     }
 
     /*Interface method*/
@@ -144,10 +147,12 @@ public class SensorDisplay extends AppCompatActivity implements SensorEventListe
     String sensorName;
     TextView sensor;
     DecimalFormat f = new DecimalFormat("0.000");
+    Date date1,date2;
     float[] gravity;
     @Override
     public final void onSensorChanged(SensorEvent event) {
         /*Low-pass filter values*/
+        date2 = new Date();
         filterValues = lowPass(event.values.clone(), filterValues);
 
         sensorName = event.sensor.getName();
@@ -171,25 +176,35 @@ public class SensorDisplay extends AppCompatActivity implements SensorEventListe
                 gravity[0] = GRAVITY_ALPHA * gravity[0] + (1 - GRAVITY_ALPHA) * event.values[0]; //GRAVITY_ALPHA = 0.8f
                 gravity[1] = GRAVITY_ALPHA * gravity[1] + (1 - GRAVITY_ALPHA) * event.values[1];
                 gravity[2] = GRAVITY_ALPHA * gravity[2] + (1 - GRAVITY_ALPHA) * event.values[2];
+
+                float linearX = event.values[0] - gravity[0];
+                float linearY = event.values[1] - gravity[1];
+                float linearZ = event.values[2] - gravity[2];
+
 //                magnitude = Math.sqrt(
 //                        Math.pow(event.values[0],2) +
 //                        Math.pow(event.values[1],2) +
 //                        Math.pow(event.values[2],2)
 //                     );
                 if (maxX == null && maxY == null  && maxZ == null ){
-                    maxX = gravity[0];
-                    maxY = gravity[1];
-                    maxZ = gravity[2];
+                    maxX = linearX;
+                    maxY = linearY;
+                    maxZ = linearZ;
                 }else{
-                    if (Math.abs(gravity[0]) > maxX){
-                        maxX = gravity[0];
+                    if (Math.abs(linearX) > maxX){
+                        maxX = linearX;
                     }
-                    if (Math.abs(gravity[1]) > maxY){
-                        maxY = gravity[1];
+                    if (Math.abs(linearY) > maxY){
+                        maxY = linearY;
                     }
-                    if (Math.abs(gravity[2]) > maxZ){
-                        maxZ = gravity[2];
+                    if (Math.abs(linearZ) > maxZ){
+                        maxZ = linearZ;
                     }
+                }
+                /*only write values to log every five seconds to minimize size and IO*/
+                if ((date2.getTime() - date1.getTime()) > 5000 ){
+
+                    log.writeLog(TAG,String.format("Accelerometer: X %f Y %f Z%f Max: X %f Y %f Z %f",linearX,linearY,linearZ,maxX,maxY,maxZ ));
                 }
             }
             sensor.setText(String.valueOf(sensorName +": "));
