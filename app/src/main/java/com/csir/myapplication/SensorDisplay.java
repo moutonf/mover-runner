@@ -30,7 +30,7 @@ public class SensorDisplay extends AppCompatActivity implements SensorEventListe
 
     private SensorManager mSensorManager;
     private static final String TAG = "MOVER_SENSOR";
-    private TextView sensorInfo;
+    private TextView sensorInfo,sensorMax;
 
     private Sensor mAccelerometer;
     private Sensor mGyro;
@@ -46,6 +46,8 @@ public class SensorDisplay extends AppCompatActivity implements SensorEventListe
 
     static final float LOW_PASS_ALPHA = 0.25f; // if ALPHA = 1 OR 0, no filter applies.
     final float GRAVITY_ALPHA = 0.8f;
+
+    Float maxX,maxY,maxZ;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -55,6 +57,8 @@ public class SensorDisplay extends AppCompatActivity implements SensorEventListe
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
 
         sensorInfo = (TextView) findViewById(R.id.sensor_info);
+        sensorMax = (TextView) findViewById(R.id.accelerometer_max);
+
         sensorInfo.setText("SENSOR INFO:\n");
         viewGroup = (ViewGroup) ((ViewGroup) this.findViewById(android.R.id.content)).getChildAt(0);
 
@@ -99,20 +103,11 @@ public class SensorDisplay extends AppCompatActivity implements SensorEventListe
 
             deviceSensors.add(mSignificantMotion);
         }
-
-
-
-
         lparams = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT );
         TextView tv;
-
-
         String info;
         sensorTextViews = new HashMap<String,TextView>();
         for (Sensor s: deviceSensors){
-//            info = s.toString() + " " + s.getMinDelay() + "\n";
-//            Log.i(TAG, "Available: " + info );
-//            sensorInfo.append(info);
             tv = new TextView(this);
             tv.setLayoutParams(lparams);
             viewGroup.addView(tv);
@@ -143,15 +138,12 @@ public class SensorDisplay extends AppCompatActivity implements SensorEventListe
         }
         return output;
     }
-
-
     /*Interface method*/
     /*https://developer.android.com/reference/android/hardware/SensorEvent.html - HIGH PASS FILTER FOR GRAVITY*/
     float [] filterValues;
     String sensorName;
     TextView sensor;
     DecimalFormat f = new DecimalFormat("0.000");
-
     float[] gravity;
     @Override
     public final void onSensorChanged(SensorEvent event) {
@@ -174,6 +166,7 @@ public class SensorDisplay extends AppCompatActivity implements SensorEventListe
 
                     gravity = filterValues;
                 }
+
                 /*Must reduce gravity values*/
                 gravity[0] = GRAVITY_ALPHA * gravity[0] + (1 - GRAVITY_ALPHA) * event.values[0]; //GRAVITY_ALPHA = 0.8f
                 gravity[1] = GRAVITY_ALPHA * gravity[1] + (1 - GRAVITY_ALPHA) * event.values[1];
@@ -183,9 +176,24 @@ public class SensorDisplay extends AppCompatActivity implements SensorEventListe
 //                        Math.pow(event.values[1],2) +
 //                        Math.pow(event.values[2],2)
 //                     );
+                if (maxX == null && maxY == null  && maxZ == null ){
+                    maxX = gravity[0];
+                    maxY = gravity[1];
+                    maxZ = gravity[2];
+                }else{
+                    if (Math.abs(gravity[0]) > maxX){
+                        maxX = gravity[0];
+                    }
+                    if (Math.abs(gravity[1]) > maxY){
+                        maxY = gravity[1];
+                    }
+                    if (Math.abs(gravity[2]) > maxZ){
+                        maxZ = gravity[2];
+                    }
+                }
             }
-
             sensor.setText(String.valueOf(sensorName +": "));
+            sensorMax.setText(String.format("maxX: %f | maxY: %f | maxZ: %f",maxX,maxY,maxZ));
             for (int i = 0; i < filterValues.length; i++){
                 sensor.append(
                         String.valueOf(f.format(event.values[i] - gravity[i]) + " ")
