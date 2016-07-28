@@ -4,8 +4,11 @@ import android.content.Context;
 import android.os.Environment;
 import android.util.Log;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Date;
 
 /*Ref: https://developer.android.com/training/basics/data-storage/files.html*/
@@ -18,6 +21,8 @@ public class LoggingService {
     String filename;
     File logFile;
     Context context;
+    FileWriter fw;
+    BufferedWriter bw;
     /*Filename is date and time when activity is run*/
     public LoggingService(Context context){
         this.context = context;
@@ -29,20 +34,45 @@ public class LoggingService {
             //internal storage
             Log.i(LOG_TAG,"Internal storage used");
             logFile = new File(this.context.getFilesDir(), filename);
+
+        }
+        /*this isn't the best way. loggingservice should only be created if successful*/
+        if (!logFile.exists()){
+            try {
+                logFile.createNewFile();
+                Log.i(LOG_TAG,"Log file successfully created");
+
+            }catch(IOException e){
+                Log.e(LOG_TAG,"Log file couldn't be created");
+                e.printStackTrace();
+            }
         }
         Log.i(LOG_TAG,"Log file location: " + logFile.getAbsolutePath());
     }
     FileOutputStream outputStream;
 
     public void writeLog(String TAG, String input){
-        String output = new Date().toString() + " " + TAG + " " + input;
+        String output = new Date().toString() + "," + TAG + "," + input + "\n";
         try {
-            outputStream = context.openFileOutput(filename, Context.MODE_PRIVATE);
-            outputStream.write(output.getBytes());
-            outputStream.close();
+            fw = new FileWriter(logFile, true);
+            bw = new BufferedWriter(fw);
+            bw.write(output);
+            bw.close();
         } catch (Exception e) {
             Log.e(TAG,"Log output could not write");
-            e.printStackTrace();
+            Log.e(TAG,Log.getStackTraceString(e));
+        }
+    }
+
+    public boolean stopLogging(){
+        try{
+
+//            bw.close();
+            Log.i(LOG_TAG,"Successfully closed");
+            return true;
+        }catch(Exception e){
+            Log.e(LOG_TAG,"BufferedWriter could not be closed");
+            return false;
         }
     }
 

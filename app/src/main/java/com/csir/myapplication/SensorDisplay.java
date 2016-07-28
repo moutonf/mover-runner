@@ -203,8 +203,10 @@ public class SensorDisplay extends AppCompatActivity implements SensorEventListe
                 }
                 /*only write values to log every five seconds to minimize size and IO*/
                 if ((date2.getTime() - date1.getTime()) > 5000 ){
+                    Log.d(TAG,"Write log @ " + date2.getTime());
 
-                    log.writeLog(TAG,String.format("Accelerometer: X %f Y %f Z%f Max: X %f Y %f Z %f",linearX,linearY,linearZ,maxX,maxY,maxZ ));
+                    log.writeLog(TAG,String.format("X,%f,Y,%f,Z%f,Max,X,%f,Y,%f,Z,%f",linearX,linearY,linearZ,maxX,maxY,maxZ ));
+                    date1 = date2;
                 }
             }
             sensor.setText(String.valueOf(sensorName +": "));
@@ -231,5 +233,11 @@ public class SensorDisplay extends AppCompatActivity implements SensorEventListe
     protected void onPause() {
         super.onPause();
         mSensorManager.unregisterListener(this);
+    }
+
+    @Override
+    protected void onDestroy(){
+        super.onDestroy();
+        log.stopLogging();
     }
 }
