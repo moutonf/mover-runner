@@ -21,6 +21,7 @@ public class LoggingService {
     String filename;
     File logFile;
     Context context;
+
     FileWriter fw;
     BufferedWriter bw;
     /*Filename is date and time when activity is run*/
@@ -49,10 +50,12 @@ public class LoggingService {
         }
         Log.i(LOG_TAG,"Log file location: " + logFile.getAbsolutePath());
     }
-    FileOutputStream outputStream;
 
     public void writeLog(String TAG, String input){
-        String output = new Date().toString() + "," + TAG + "," + input + "\n";
+        //comma-seperate values, easier for analysis
+        //if the logger was not correctly created, this will throw exceptions repeatedly
+
+        String output = String.format("%s, %s, %s\n",new Date().toString(), TAG, input);
         try {
             fw = new FileWriter(logFile, true);
             bw = new BufferedWriter(fw);
@@ -63,20 +66,6 @@ public class LoggingService {
             Log.e(TAG,Log.getStackTraceString(e));
         }
     }
-
-    public boolean stopLogging(){
-        try{
-
-//            bw.close();
-            Log.i(LOG_TAG,"Successfully closed");
-            return true;
-        }catch(Exception e){
-            Log.e(LOG_TAG,"BufferedWriter could not be closed");
-            return false;
-        }
-    }
-
-
     /* Checks if external storage is available for read and write - External storage is used unless unavailable */
     private boolean isExternalStorageWritable() {
         String state = Environment.getExternalStorageState();

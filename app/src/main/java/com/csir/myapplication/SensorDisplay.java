@@ -246,6 +246,5 @@ public class SensorDisplay extends AppCompatActivity implements SensorEventListe
     @Override
     protected void onDestroy(){
         super.onDestroy();
-        log.stopLogging();
     }
 }
