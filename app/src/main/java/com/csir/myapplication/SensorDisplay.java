@@ -115,7 +115,7 @@ public class SensorDisplay extends AppCompatActivity implements SensorEventListe
             Log.d(TAG,"Adding textview " + s.getName());
             sensorTextViews.put(s.getName(), tv);
         }
-
+        maxMagnitude = null;
         date1 = new Date();
     }
 
@@ -149,6 +149,7 @@ public class SensorDisplay extends AppCompatActivity implements SensorEventListe
     DecimalFormat f = new DecimalFormat("0.000");
     Date date1,date2;
     float[] gravity;
+    Double maxMagnitude;
     @Override
     public final void onSensorChanged(SensorEvent event) {
         /*Low-pass filter values*/
@@ -161,7 +162,6 @@ public class SensorDisplay extends AppCompatActivity implements SensorEventListe
 
         sensor = (TextView)sensorTextViews.get(sensorName);
 
-        double magnitude;
 
         if (sensor != null){
             if (sensorName.toUpperCase().equals("ACCELEROMETER")){
@@ -180,24 +180,32 @@ public class SensorDisplay extends AppCompatActivity implements SensorEventListe
                 float linearX = event.values[0] - gravity[0];
                 float linearY = event.values[1] - gravity[1];
                 float linearZ = event.values[2] - gravity[2];
+                double magnitude = Math.sqrt(
+                        Math.pow(linearX,2) +
+                        Math.pow(linearY,2) +
+                        Math.pow(linearZ,2)
+                     );
 
-//                magnitude = Math.sqrt(
-//                        Math.pow(event.values[0],2) +
-//                        Math.pow(event.values[1],2) +
-//                        Math.pow(event.values[2],2)
-//                     );
+                if (maxMagnitude == null){
+                    maxMagnitude = magnitude;
+                }else{
+                    if (Math.abs(magnitude) > Math.abs(maxMagnitude)){
+                        maxMagnitude = magnitude;
+                    }
+                }
                 if (maxX == null && maxY == null  && maxZ == null ){
                     maxX = linearX;
                     maxY = linearY;
                     maxZ = linearZ;
                 }else{
-                    if (Math.abs(linearX) > maxX){
+                    //the original signed value is stored, not the absolute value
+                    if (Math.abs(linearX) > Math.abs(maxX)){
                         maxX = linearX;
                     }
-                    if (Math.abs(linearY) > maxY){
+                    if (Math.abs(linearY) > Math.abs(maxY)){
                         maxY = linearY;
                     }
-                    if (Math.abs(linearZ) > maxZ){
+                    if (Math.abs(linearZ) > Math.abs(maxZ)){
                         maxZ = linearZ;
                     }
                 }
@@ -205,12 +213,12 @@ public class SensorDisplay extends AppCompatActivity implements SensorEventListe
                 if ((date2.getTime() - date1.getTime()) > 5000 ){
                     Log.d(TAG,"Write log @ " + date2.getTime());
 
-                    log.writeLog(TAG,String.format("X,%f,Y,%f,Z%f,Max,X,%f,Y,%f,Z,%f",linearX,linearY,linearZ,maxX,maxY,maxZ ));
+                    log.writeLog(TAG,String.format("X,%f,Y,%f,Z%f,Max,X,%f,Y,%f,Z,%f, Magnitude, %f",linearX,linearY,linearZ,maxX,maxY,maxZ, magnitude ));
                     date1 = date2;
                 }
+                sensorMax.setText(String.format("maxX: %f | maxY: %f | maxZ: %f | magnitude: %f",maxX,maxY,maxZ, maxMagnitude));
             }
             sensor.setText(String.valueOf(sensorName +": "));
-            sensorMax.setText(String.format("maxX: %f | maxY: %f | maxZ: %f",maxX,maxY,maxZ));
             for (int i = 0; i < filterValues.length; i++){
                 sensor.append(
                         String.valueOf(f.format(event.values[i] - gravity[i]) + " ")
