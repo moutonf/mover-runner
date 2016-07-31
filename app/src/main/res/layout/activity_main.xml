@@ -12,11 +12,11 @@
     tools:context="com.csir.myapplication.MainActivity">
 
     <Button
-        android:id="@+id/sensor_display"
+        android:id="@+id/runner"
         android:layout_height="wrap_content"
         android:layout_width="wrap_content"
-        android:text="@string/sensor_display"
-        android:onClick="getSensors" />
+        android:text="@string/runner"
+        android:onClick="getRunner" />
 
     <Button
         android:id="@+id/requests"
@@ -25,11 +25,6 @@
         android:text="@string/requests"
         android:onClick="getRequests" />
 
-    <Button
-        android:id="@+id/location"
-        android:layout_height="wrap_content"
-        android:layout_width="wrap_content"
-        android:text="@string/location"
-        android:onClick="getLocation" />
+
 
 </LinearLayout>

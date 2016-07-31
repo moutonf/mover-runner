@@ -1,16 +1,22 @@
-package com.csir.myapplication;
-
+package layout;
 import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.location.Location;
-import android.support.v7.app.AppCompatActivity;
+import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import com.csir.myapplication.LoggingService;
+import com.csir.myapplication.R;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -18,16 +24,20 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
-import android.widget.LinearLayout;
-import android.widget.LinearLayout.LayoutParams;
-import android.widget.Toast;
+/**
+ * A simple {@link Fragment} subclass.
+ * Activities that contain this fragment must implement the
+ * {@link SensorDisplay.OnFragmentInteractionListener} interface
+ * to handle interaction events.
+ * Use the {@link SensorDisplay#newInstance} factory method to
+ * create an instance of this fragment.
+ */
+public class SensorDisplay extends Fragment implements SensorEventListener {
+    // TODO: Rename parameter arguments, choose names that match
+    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesUtil;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.LocationRequest;
+    private OnFragmentInteractionListener mListener;
 
-public class SensorDisplay extends AppCompatActivity implements SensorEventListener {
     LoggingService log;
     private SensorManager mSensorManager;
     private static final String TAG = "MOVER_SENSOR";
@@ -43,25 +53,81 @@ public class SensorDisplay extends AppCompatActivity implements SensorEventListe
     private List<Sensor> deviceSensors;
     private ViewGroup viewGroup;
 
-    private LayoutParams lparams;
+    private LinearLayout.LayoutParams lparams;
 
     static final float LOW_PASS_ALPHA = 0.25f; // if ALPHA = 1 OR 0, no filter applies.
     final float GRAVITY_ALPHA = 0.8f;
 
     Float maxX,maxY,maxZ;
+    View view;
+
+    float [] filterValues;
+    String sensorName;
+    TextView sensor;
+    DecimalFormat f = new DecimalFormat("0.000");
+    Date date1,date2;
+    float[] gravity;
+    Double maxMagnitude;
+
+    private FrameLayout mFlParent;
+
+    public SensorDisplay() {
+        // Required empty public constructor
+    }
+
+    // TODO: Rename and change types and number of parameters
+    public static SensorDisplay newInstance() {
+        return new SensorDisplay();
+    }
+
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_sensor_display);
+    }
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        view = inflater.inflate(R.layout.fragment_sensor_display, container, false);
+        sensorInfo = (TextView) view.findViewById(R.id.sensor_info);
+        sensorMax = (TextView) view.findViewById(R.id.accelerometer_max);
+        mFlParent  = (FrameLayout) view.findViewById(R.id.fl_frag_sensor_display_parent);
+        return view;
+    }
 
-        mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+    /*Enforces the interface*/
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof OnFragmentInteractionListener) {
+            mListener = (OnFragmentInteractionListener) context;
+        } else {
+            throw new RuntimeException(context.toString()
+                    + " must implement OnFragmentInteractionListener");
+        }
+    }
 
-        sensorInfo = (TextView) findViewById(R.id.sensor_info);
-        sensorMax = (TextView) findViewById(R.id.accelerometer_max);
-        log = new LoggingService(this);
-        sensorInfo.setText("SENSOR INFO:\n");
-        viewGroup = (ViewGroup) ((ViewGroup) this.findViewById(android.R.id.content)).getChildAt(0);
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mListener = null;
+    }
+
+    public interface OnFragmentInteractionListener {
+        // TODO: Update argument type and name
+        void onFragmentInteraction(Uri uri);
+    }
+    /*Interface method*/
+    @Override
+    public final void onAccuracyChanged(Sensor sensor, int accuracy) {
+        // Do something here if sensor accuracy changes.
+    }
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState){
+        super.onActivityCreated(savedInstanceState);
+        mSensorManager = (SensorManager) getActivity().getSystemService(Context.SENSOR_SERVICE);
+
+        log = new LoggingService(view.getContext());
 
         /*Get potentially useful sensors*/
         mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
@@ -71,7 +137,6 @@ public class SensorDisplay extends AppCompatActivity implements SensorEventListe
         mRotationVector = mSensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
         mSignificantMotion = mSensorManager.getDefaultSensor(Sensor.TYPE_SIGNIFICANT_MOTION);
 
-        //List<Sensor> deviceSensors = mSensorManager.getSensorList(Sensor.TYPE_ALL);
         deviceSensors = new ArrayList<Sensor>();
         //A list of all potentially useful sensors
         if (mAccelerometer != null){
@@ -80,49 +145,39 @@ public class SensorDisplay extends AppCompatActivity implements SensorEventListe
         }
         if (mGyro != null){
             Log.i(TAG, "Gyro sensor added");
-
             deviceSensors.add(mGyro);
         }
         if (mLight != null){
             Log.i(TAG, "Light sensor added");
-
             deviceSensors.add(mLight);
         }
-
         if (mLinearAcceleration != null){
             Log.i(TAG, "Linear Acceleration sensor added");
-
             deviceSensors.add(mLinearAcceleration);
         }
         if (mRotationVector != null){
             Log.i(TAG, "Roation Vector sensor added");
-
             deviceSensors.add(mRotationVector);
         }
         if (mSignificantMotion != null){
             Log.i(TAG, "Significant Motion sensor added");
-
             deviceSensors.add(mSignificantMotion);
         }
-        lparams = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT );
+
+        lparams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT );
+        /*Adding an individual TextView for each sensor*/
         TextView tv;
-        String info;
         sensorTextViews = new HashMap<String,TextView>();
         for (Sensor s: deviceSensors){
-            tv = new TextView(this);
+            tv = new TextView(view.getContext());
             tv.setLayoutParams(lparams);
-            viewGroup.addView(tv);
+            mFlParent.addView(tv);
             Log.d(TAG,"Adding textview " + s.getName());
             sensorTextViews.put(s.getName(), tv);
         }
+
         maxMagnitude = null;
         date1 = new Date();
-    }
-
-    /*Interface method*/
-    @Override
-    public final void onAccuracyChanged(Sensor sensor, int accuracy) {
-        // Do something here if sensor accuracy changes.
     }
 
     /*Ref: https://github.com/Bhide/Low-Pass-Filter-To-Android-Sensors*/
@@ -131,10 +186,9 @@ public class SensorDisplay extends AppCompatActivity implements SensorEventListe
     //Previous values with added dampened  values are returned
     protected float[] lowPass( float[] input, float[] output ) {
         if ( output == null ){
-                Log.d(TAG,"Setting initial pass values");
-                 return input;
+            Log.d(TAG,"Setting initial pass values");
+            return input;
         }
-
         for ( int i=0; i<input.length; i++ ) {
             /*Appending a dampened value from the new inputs*/
             output[i] = output[i] + LOW_PASS_ALPHA * (input[i] - output[i]);
@@ -143,35 +197,21 @@ public class SensorDisplay extends AppCompatActivity implements SensorEventListe
     }
     /*Interface method*/
     /*https://developer.android.com/reference/android/hardware/SensorEvent.html - HIGH PASS FILTER FOR GRAVITY*/
-    float [] filterValues;
-    String sensorName;
-    TextView sensor;
-    DecimalFormat f = new DecimalFormat("0.000");
-    Date date1,date2;
-    float[] gravity;
-    Double maxMagnitude;
     @Override
     public final void onSensorChanged(SensorEvent event) {
         /*Low-pass filter values*/
         date2 = new Date();
         filterValues = lowPass(event.values.clone(), filterValues);
-
         sensorName = event.sensor.getName();
         Log.i(TAG, "Sensor: " + sensorName);
         Log.i(TAG, "Timestamp: " + event.timestamp);
-
         sensor = (TextView)sensorTextViews.get(sensorName);
-
-
         if (sensor != null){
             if (sensorName.toUpperCase().equals("ACCELEROMETER")){
-
                 if (gravity==null){
                     Log.d(TAG,"Setting initial gravity values");
-
                     gravity = filterValues;
                 }
-
                 /*Must reduce gravity values*/
                 gravity[0] = GRAVITY_ALPHA * gravity[0] + (1 - GRAVITY_ALPHA) * event.values[0]; //GRAVITY_ALPHA = 0.8f
                 gravity[1] = GRAVITY_ALPHA * gravity[1] + (1 - GRAVITY_ALPHA) * event.values[1];
@@ -182,9 +222,9 @@ public class SensorDisplay extends AppCompatActivity implements SensorEventListe
                 float linearZ = event.values[2] - gravity[2];
                 double magnitude = Math.sqrt(
                         Math.pow(linearX,2) +
-                        Math.pow(linearY,2) +
-                        Math.pow(linearZ,2)
-                     );
+                                Math.pow(linearY,2) +
+                                Math.pow(linearZ,2)
+                );
 
                 if (maxMagnitude == null){
                     maxMagnitude = magnitude;
@@ -227,24 +267,16 @@ public class SensorDisplay extends AppCompatActivity implements SensorEventListe
             }
         }
     }
-
-    @Override
-    protected void onResume() {
+    /*Received at the same time as the activity*/
+    public void onResume() {
         super.onResume();
         for (Sensor s: deviceSensors){
             mSensorManager.registerListener(this, s, SensorManager.SENSOR_DELAY_NORMAL);
         }
 
     }
-
-    @Override
-    protected void onPause() {
+    public void onPause() {
         super.onPause();
         mSensorManager.unregisterListener(this);
-    }
-
-    @Override
-    protected void onDestroy(){
-        super.onDestroy();
     }
 }

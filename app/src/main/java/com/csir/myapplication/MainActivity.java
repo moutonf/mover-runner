@@ -18,14 +18,19 @@ public class MainActivity extends AppCompatActivity {
         this.startActivity(intent);
     }
 
-    public void getSensors(View view) {
-         intent = new Intent(this, SensorDisplay.class);
-        this.startActivity(intent);
-    }
+//    public void getSensors(View view) {
+//         intent = new Intent(this, SensorDisplayFragment.class);
+//        this.startActivity(intent);
+//    }
 
     public void getLocation(View view) {
          intent = new Intent(this, FindLocation.class);
         this.startActivity(intent);
     }
+    public void getRunner(View view) {
+        intent = new Intent(this, Runner.class);
+        this.startActivity(intent);
+    }
+
 
 }

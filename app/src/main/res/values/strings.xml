@@ -7,6 +7,7 @@
     <!--MENU LABELS-->
     <string name="requests">Requests</string>
     <string name="sensor_display">Display Sensors</string>
+    <string name="runner">Runner</string>
     <string name="location">Get location</string>
     <string name="map">Show map</string>
 
@@ -27,5 +28,8 @@
     <!--BUTTON LABELS-->
     <string name="start">Start</string>
     <string name="stop">Stop</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 </resources>
