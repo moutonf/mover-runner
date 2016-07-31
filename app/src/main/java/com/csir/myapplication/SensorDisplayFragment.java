@@ -4,6 +4,7 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -23,7 +24,7 @@ import java.util.List;
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link SensorDisplayFragment.OnFragmentInteractionListener} interface
+ * {@link SensorDisplayFragment.OnSensorFragmentInteractionListener} interface
  * to handle interaction events.
  * Use the {@link SensorDisplayFragment#newInstance} factory method to
  * create an instance of this fragment.
@@ -48,6 +49,7 @@ public class SensorDisplayFragment extends Fragment implements SensorEventListen
     HashMap<String, TextView> sensorTextViews;
     private List<Sensor> deviceSensors;
     private ViewGroup viewGroup;
+    private Requests requester;
 
     private LinearLayout.LayoutParams lparams;
 
@@ -56,7 +58,7 @@ public class SensorDisplayFragment extends Fragment implements SensorEventListen
 
     Float maxX,maxY,maxZ;
     View view;
-
+    RunnerMan activity;
     float [] filterValues;
     String sensorName;
     TextView sensor;
@@ -122,7 +124,7 @@ public class SensorDisplayFragment extends Fragment implements SensorEventListen
     public void onActivityCreated(Bundle savedInstanceState){
         super.onActivityCreated(savedInstanceState);
         mSensorManager = (SensorManager) getActivity().getSystemService(Context.SENSOR_SERVICE);
-
+        activity = (RunnerMan)getActivity();
         log = new LoggingService(view.getContext());
 
         /*Get potentially useful sensors*/
@@ -171,7 +173,7 @@ public class SensorDisplayFragment extends Fragment implements SensorEventListen
             Log.d(TAG,"Adding textview " + s.getName());
             sensorTextViews.put(s.getName(), tv);
         }
-
+        requester = new Requests();
         maxMagnitude = null;
         date1 = new Date();
     }
@@ -191,6 +193,7 @@ public class SensorDisplayFragment extends Fragment implements SensorEventListen
         }
         return output;
     }
+    double magnitude;
     /*Interface method*/
     /*https://developer.android.com/reference/android/hardware/SensorEvent.html - HIGH PASS FILTER FOR GRAVITY*/
     @Override
@@ -216,7 +219,7 @@ public class SensorDisplayFragment extends Fragment implements SensorEventListen
                 float linearX = event.values[0] - gravity[0];
                 float linearY = event.values[1] - gravity[1];
                 float linearZ = event.values[2] - gravity[2];
-                double magnitude = Math.sqrt(
+                magnitude = Math.sqrt(
                         Math.pow(linearX,2) +
                                 Math.pow(linearY,2) +
                                 Math.pow(linearZ,2)
@@ -262,6 +265,20 @@ public class SensorDisplayFragment extends Fragment implements SensorEventListen
 //                sensor.append(String.valueOf(event.values[i] + " "));
             }
         }
+        isAccident(magnitude);
+    }
+
+    private boolean isAccident(double magnitude){
+        Location currentLocation;
+        if (magnitude > 50){
+            currentLocation = activity.getLocation();
+            /*post the location*/
+            String response = requester.sendAccident(currentLocation);
+            return true;
+        }
+
+
+        return false;
     }
     /*Received at the same time as the activity*/
     public void onResume() {

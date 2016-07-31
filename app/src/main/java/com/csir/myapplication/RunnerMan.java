@@ -86,6 +86,10 @@ public class RunnerMan extends FragmentActivity implements SensorDisplayFragment
         /*sensor shouldn't require any input from location, unless coordinates*/
     }
 
+    public Location getLocation(){
+        return mCurrentLocation;
+    }
+
     /*SET UP INTERVAL LOCATION UPDATES*/
     protected void createLocationRequest() {
         mLocationRequest = new LocationRequest();

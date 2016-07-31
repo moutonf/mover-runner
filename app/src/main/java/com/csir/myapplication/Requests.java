@@ -1,5 +1,6 @@
 package com.csir.myapplication;
 
+import android.location.Location;
 import android.net.Uri;
 import android.os.StrictMode;
 import android.support.v7.app.AppCompatActivity;
@@ -23,10 +24,8 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-public class Requests extends AppCompatActivity {
+public class Requests {
 
-    TextView txtView;
-    Button button, postBtn;
     OkHttpClient client;
 
     public static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
@@ -40,25 +39,12 @@ public class Requests extends AppCompatActivity {
     final String ID_PARAM = "id";
     final String MESSAGE_PARAM = "message";
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_requests);
-
-        txtView = (TextView) findViewById(R.id.textView);
-        txtView.setText("Waiting for response..");
-
-        button = (Button) findViewById(R.id.get_button);
-        postBtn = (Button) findViewById(R.id.post_button);
-
+    public Requests(){
         client  = new OkHttpClient();
         /*Requests should be async, this is dirty*/
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
-
     }
-
-
 
     String run(String url) throws IOException {
         Request request = new Request.Builder()
@@ -67,29 +53,33 @@ public class Requests extends AppCompatActivity {
         Response response = client.newCall(request).execute();
         return response.body().string();
     }
-    public void getRequest(View view) {
+    public String getRequest() {
         String response;
         try {
-
             Uri builtUri = Uri.parse(GET_BASE_URL)
                     .buildUpon()
                     .appendQueryParameter(ID_PARAM, "get-id")
                     .appendQueryParameter(MESSAGE_PARAM, "get-message")
                     .build();
-
             response = run(builtUri.toString());
-            txtView.append(response);
+            return response;
         }catch(IOException ex){
-            ex.printStackTrace();
+//            ex.printStackTrace();
+            return ("A problem occurred");
         }
-
     }
     /*POST requests*/
     /*The server currently checks id and msg arguments*/
-    String post(String url) throws IOException {
+    String post(String url, Location location) throws IOException {
+
+        String latitude = String.valueOf(location.getLatitude());
+        String longitude = String.valueOf(location.getLongitude());
+
         RequestBody formBody = new FormBody.Builder()
                 .add("id", "gavin")
                 .add("message", "this is a message from gavin")
+                .add("latitude",latitude)
+                .add("longitude",longitude)
                 .build();
 //        RequestBody body = RequestBody.create(JSON, json);
         Request request = new Request.Builder()
@@ -100,15 +90,15 @@ public class Requests extends AppCompatActivity {
         return response.body().string();
     }
 
-    public void postRequest(View view) {
+    public String sendAccident(Location location) {
         String response;
         try {
         //MUST BUILD A JSON
-            response=  post("http://moutonf.co.za:5000/post-api");
-            txtView.append(response);
-
+            response =  post("http://moutonf.co.za:5000/accident", location);
+            return response;
         }catch(IOException ex){
             ex.printStackTrace();
+            return ("A problem occurred");
         }
 
     }
