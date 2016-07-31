@@ -18,13 +18,4 @@
         android:text="@string/runner"
         android:onClick="getRunner" />
 
-    <Button
-        android:id="@+id/requests"
-        android:layout_height="wrap_content"
-        android:layout_width="wrap_content"
-        android:text="@string/requests"
-        android:onClick="getRequests" />
-
-
-
 </LinearLayout>

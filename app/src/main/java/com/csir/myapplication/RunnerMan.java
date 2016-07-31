@@ -3,8 +3,9 @@ package com.csir.myapplication;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
+import android.net.Uri;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.TextView;
@@ -21,17 +22,14 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 
 import java.text.DateFormat;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.Locale;
 
-public class FindLocation extends AppCompatActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks,
+public class RunnerMan extends FragmentActivity implements SensorDisplayFragment.OnSensorFragmentInteractionListener, OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener, LocationListener {
 
         protected static final String TAG = "MOVER_LOCATION_SERVICE";
@@ -57,7 +55,7 @@ public class FindLocation extends AppCompatActivity implements OnMapReadyCallbac
         @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
-            setContentView(R.layout.activity_find_location);
+            setContentView(R.layout.activity_runner_man);
 
             mapReady = false;
             mRequestingLocationUpdates = true;
@@ -84,7 +82,9 @@ public class FindLocation extends AppCompatActivity implements OnMapReadyCallbac
 
             buildGoogleApiClient();
         }
-
+    public void onSensorFragmentInteraction(Uri uri){
+        /*sensor shouldn't require any input from location, unless coordinates*/
+    }
 
     /*SET UP INTERVAL LOCATION UPDATES*/
     protected void createLocationRequest() {

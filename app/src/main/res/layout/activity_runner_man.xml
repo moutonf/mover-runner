@@ -7,7 +7,11 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context=".FindLocation">
+    tools:context=".RunnerMan">
+    <fragment android:name="com.csir.myapplication.SensorDisplayFragment"
+        android:id="@+id/sensor_display_fragment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
 
     <TextView
         android:id="@+id/latitude_text"
@@ -43,27 +47,26 @@
         android:id="@+id/map"
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:context="com.csir.myapplication.FindLocation" />
-<LinearLayout
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="horizontal">
-    <Button
-        android:id="@+id/start"
         android:layout_height="wrap_content"
-        android:layout_width="wrap_content"
-        android:text="@string/start"
-         />
-    <Button
-        android:id="@+id/stop"
-        android:layout_height="wrap_content"
-        android:layout_width="wrap_content"
-        android:text="@string/stop"
-         />
-</LinearLayout>
+        tools:context=".RunnerMan" />
 
 
-
+<!--<LinearLayout-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:orientation="horizontal">-->
+    <!--<Button-->
+        <!--android:id="@+id/start"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:text="@string/start"-->
+         <!--/>-->
+    <!--<Button-->
+        <!--android:id="@+id/stop"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:text="@string/stop"-->
+         <!--/>-->
+<!--</LinearLayout>-->
 
 </LinearLayout>

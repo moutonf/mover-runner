@@ -1,4 +1,4 @@
-package layout;
+package com.csir.myapplication;
 import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -11,12 +11,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-
-import com.csir.myapplication.LoggingService;
-import com.csir.myapplication.R;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -27,16 +23,16 @@ import java.util.List;
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link SensorDisplay.OnFragmentInteractionListener} interface
+ * {@link SensorDisplayFragment.OnFragmentInteractionListener} interface
  * to handle interaction events.
- * Use the {@link SensorDisplay#newInstance} factory method to
+ * Use the {@link SensorDisplayFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class SensorDisplay extends Fragment implements SensorEventListener {
+public class SensorDisplayFragment extends Fragment implements SensorEventListener {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
 
-    private OnFragmentInteractionListener mListener;
+    private OnSensorFragmentInteractionListener mListener;
 
     LoggingService log;
     private SensorManager mSensorManager;
@@ -69,15 +65,15 @@ public class SensorDisplay extends Fragment implements SensorEventListener {
     float[] gravity;
     Double maxMagnitude;
 
-    private FrameLayout mFlParent;
+    private LinearLayout mFlParent;
 
-    public SensorDisplay() {
+    public SensorDisplayFragment() {
         // Required empty public constructor
     }
 
     // TODO: Rename and change types and number of parameters
-    public static SensorDisplay newInstance() {
-        return new SensorDisplay();
+    public static SensorDisplayFragment newInstance() {
+        return new SensorDisplayFragment();
     }
 
     @Override
@@ -91,7 +87,7 @@ public class SensorDisplay extends Fragment implements SensorEventListener {
         view = inflater.inflate(R.layout.fragment_sensor_display, container, false);
         sensorInfo = (TextView) view.findViewById(R.id.sensor_info);
         sensorMax = (TextView) view.findViewById(R.id.accelerometer_max);
-        mFlParent  = (FrameLayout) view.findViewById(R.id.fl_frag_sensor_display_parent);
+        mFlParent  = (LinearLayout) view.findViewById(R.id.fl_frag_sensor_display_parent);
         return view;
     }
 
@@ -99,11 +95,11 @@ public class SensorDisplay extends Fragment implements SensorEventListener {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
+        if (context instanceof OnSensorFragmentInteractionListener) {
+            mListener = (OnSensorFragmentInteractionListener) context;
         } else {
             throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
+                    + " must implement OnSensorFragmentInteractionListener");
         }
     }
 
@@ -113,9 +109,9 @@ public class SensorDisplay extends Fragment implements SensorEventListener {
         mListener = null;
     }
 
-    public interface OnFragmentInteractionListener {
+    public interface OnSensorFragmentInteractionListener {
         // TODO: Update argument type and name
-        void onFragmentInteraction(Uri uri);
+        void onSensorFragmentInteraction(Uri uri);
     }
     /*Interface method*/
     @Override

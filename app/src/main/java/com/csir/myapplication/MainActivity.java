@@ -13,22 +13,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
     }
 
-    public void getRequests(View view) {
-         intent = new Intent(this, Requests.class);
-        this.startActivity(intent);
-    }
-
-//    public void getSensors(View view) {
-//         intent = new Intent(this, SensorDisplayFragment.class);
-//        this.startActivity(intent);
-//    }
-
-    public void getLocation(View view) {
-         intent = new Intent(this, FindLocation.class);
-        this.startActivity(intent);
-    }
     public void getRunner(View view) {
-        intent = new Intent(this, Runner.class);
+        intent = new Intent(this, RunnerMan.class);
         this.startActivity(intent);
     }
 

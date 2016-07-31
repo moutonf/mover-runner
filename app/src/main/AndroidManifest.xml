@@ -23,7 +23,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".Requests" />
-        <activity android:name=".FindLocation" />
+        <activity android:name=".RunnerMan" />
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
              (See the file "res/values/google_maps_api.xml").
@@ -36,7 +36,6 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
 
-        <activity android:name=".Runner"></activity>
     </application>
 
 </manifest>
