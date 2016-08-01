@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -270,10 +271,13 @@ public class SensorDisplayFragment extends Fragment implements SensorEventListen
 
     private boolean isAccident(double magnitude){
         Location currentLocation;
+        /*need to determine a proper detection algorithm*/
         if (magnitude > 50){
             currentLocation = activity.getLocation();
+            Toast.makeText(activity, "An accident occured?",
+                    Toast.LENGTH_LONG).show();
             /*post the location*/
-            String response = requester.sendAccident(currentLocation);
+//            String response = requester.sendAccident(currentLocation);
             return true;
         }
 
