@@ -255,5 +255,26 @@ public class RunnerMan extends FragmentActivity implements SensorDisplayFragment
                 mGoogleApiClient, this);
     }
 
+    public void stopActivity()
+    {
+        onBackPressed();
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        finish();
+    }
+
+//    @Override
+//    public boolean stopActivity(int keyCode, KeyEvent event)
+//    {            finish();
+//
+//        if ((keyCode == KeyEvent.KEYCODE_BACK))
+//        {
+//        }
+//        return super.onKeyDown(keyCode, event);
+//    }
+
 
 }

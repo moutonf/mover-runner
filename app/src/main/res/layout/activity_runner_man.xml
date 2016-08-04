@@ -50,8 +50,16 @@
         android:layout_height="wrap_content"
         tools:context=".RunnerMan" />
 
+    <Button
+        android:id="@+id/stop_runer"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:text="@string/stop"
+        android:onClick="stopActivity" />
 
-<!--<LinearLayout-->
+
+
+    <!--<LinearLayout-->
     <!--android:layout_width="match_parent"-->
     <!--android:layout_height="wrap_content"-->
     <!--android:orientation="horizontal">-->
