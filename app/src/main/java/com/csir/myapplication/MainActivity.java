@@ -11,6 +11,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        Intent intent = getIntent();
+        String message = intent.getStringExtra(LoginActivity.USER_ID);
+        this.setTitle("User:" + message);
     }
 
     public void getRunner(View view) {
