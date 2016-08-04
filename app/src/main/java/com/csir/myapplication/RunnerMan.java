@@ -8,6 +8,7 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -255,9 +256,9 @@ public class RunnerMan extends FragmentActivity implements SensorDisplayFragment
                 mGoogleApiClient, this);
     }
 
-    public void stopActivity()
+    public void stop(View view)
     {
-        onBackPressed();
+        finish();
     }
 
     @Override
