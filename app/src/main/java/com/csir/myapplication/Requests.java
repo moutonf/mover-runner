@@ -11,6 +11,9 @@ import android.widget.Button;
 import android.widget.TextView;
 
 /*OkHTTP classes*/
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.IOException;
 import java.net.URL;
 
@@ -30,14 +33,14 @@ public class Requests {
 
     public static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
     private static final String TAG = "CONNECTION";
+    final String POST_DEV_URL = "http://127.0.0.1:5000";
+//    final String POST_BASE_URL =
+//            "http://moutonf.co.za:5000/post-api";
+//    final String GET_BASE_URL =
+//            "http://moutonf.co.za:5000/get-api";
 
-    final String POST_BASE_URL =
-            "http://moutonf.co.za:5000/post-api";
-    final String GET_BASE_URL =
-            "http://moutonf.co.za:5000/get-api";
-
-    final String ID_PARAM = "id";
-    final String MESSAGE_PARAM = "message";
+    final String LOGIN = "login";
+    final String REGISTER = "register";
 
     public Requests(){
         client  = new OkHttpClient();
@@ -46,62 +49,96 @@ public class Requests {
         StrictMode.setThreadPolicy(policy);
     }
 
-    String run(String url) throws IOException {
-        Request request = new Request.Builder()
-                .url(url)
-                .build();
-        Response response = client.newCall(request).execute();
-        return response.body().string();
-    }
-    public String getRequest() {
-        String response;
-        try {
-            Uri builtUri = Uri.parse(GET_BASE_URL)
-                    .buildUpon()
-                    .appendQueryParameter(ID_PARAM, "get-id")
-                    .appendQueryParameter(MESSAGE_PARAM, "get-message")
-                    .build();
-            response = run(builtUri.toString());
-            return response;
-        }catch(IOException ex){
-//            ex.printStackTrace();
-            return ("A problem occurred");
+    private JSONObject run(Request request) throws IOException {
+        JSONObject result;
+        try{
+            Response response = client.newCall(request).execute();
+            result = new JSONObject(response.body().toString());
+        }catch(IOException e){
+            return null;
+        }catch(JSONException e){
+            return null;
         }
+        return result;
     }
+//    public String getRequest() {
+//        String response;
+//        try {
+//            Uri builtUri = Uri.parse(POST_DEV_URL)
+//                    .buildUpon()
+//                    .appendQueryParameter(ID_PARAM, "get-id")
+//                    .appendQueryParameter(MESSAGE_PARAM, "get-message")
+//                    .build();
+//            response = run(builtUri.toString());
+//            return response;
+//        }catch(IOException ex){
+////            ex.printStackTrace();
+//            return ("A problem occurred");
+//        }
+//    }
     /*POST requests*/
     /*The server currently checks id and msg arguments*/
-    String post(String url, Location location) throws IOException {
+//    String post(String url, Location location) throws IOException {
+//
+//        String latitude = String.valueOf(location.getLatitude());
+//        String longitude = String.valueOf(location.getLongitude());
+//
+//        RequestBody formBody = new FormBody.Builder()
+//                .add("id", "gavin")
+//                .add("message", "this is a message from gavin")
+//                .add("latitude",latitude)
+//                .add("longitude",longitude)
+//                .build();
+////        RequestBody body = RequestBody.create(JSON, json);
+//        Request request = new Request.Builder()
+//                .url(url)
+//                .post(formBody)
+//                .build();
+//        Response response = client.newCall(request).execute();
+//        return response.body().string();
+//    }
 
-        String latitude = String.valueOf(location.getLatitude());
-        String longitude = String.valueOf(location.getLongitude());
-
+    public JSONObject login(String email, String password) throws IOException
+    {
         RequestBody formBody = new FormBody.Builder()
-                .add("id", "gavin")
-                .add("message", "this is a message from gavin")
-                .add("latitude",latitude)
-                .add("longitude",longitude)
+                .add("email", email)
+                .add("password", password)
                 .build();
-//        RequestBody body = RequestBody.create(JSON, json);
         Request request = new Request.Builder()
-                .url(url)
+                .url(POST_DEV_URL + "/" + LOGIN)
                 .post(formBody)
                 .build();
-        Response response = client.newCall(request).execute();
-        return response.body().string();
-    }
 
-    public String sendAccident(Location location) {
-        String response;
-        try {
-        //MUST BUILD A JSON
-            response =  post("http://moutonf.co.za:5000/accident", location);
-            return response;
-        }catch(IOException ex){
-            ex.printStackTrace();
-            return ("A problem occurred");
-        }
+        return run(request);
 
     }
+
+    public JSONObject register(String email, String password, String passwordConfirm) throws IOException
+    {
+        RequestBody formBody = new FormBody.Builder()
+                .add("email", email)
+                .add("password", password)
+                .add("password_confirm", passwordConfirm)
+                .build();
+        Request request = new Request.Builder()
+                .url(POST_DEV_URL + "/" + REGISTER)
+                .post(formBody)
+                .build();
+        return run(request);
+
+    }
+//    public String sendAccident(Location location) {
+//        String response;
+//        try {
+//        //MUST BUILD A JSON
+//            response =  post("http://moutonf.co.za:5000/accident", location);
+//            return response;
+//        }catch(IOException ex){
+//            ex.printStackTrace();
+//            return ("A problem occurred");
+//        }
+//
+//    }
 
 
 }

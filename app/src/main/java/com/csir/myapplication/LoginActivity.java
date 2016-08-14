@@ -42,6 +42,8 @@ import static android.Manifest.permission.READ_CONTACTS;
  */
 public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<Cursor> {
     Intent intent;
+    private Requests requester;
+
     public final static String USER_ID = "USER_ID";
     /**
      * Id to identity READ_CONTACTS permission request.
@@ -85,6 +87,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 return false;
             }
         });
+        requester = new Requests();
 
         Button mEmailSignInButton = (Button) findViewById(R.id.email_sign_in_button);
         mEmailSignInButton.setOnClickListener(new OnClickListener() {
@@ -315,6 +318,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
             try {
                 // Simulate network access.
+            String response = requester.sendAccident(currentLocation);
                 Thread.sleep(2000);
             } catch (InterruptedException e) {
                 return false;
