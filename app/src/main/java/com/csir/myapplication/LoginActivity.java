@@ -21,6 +21,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -32,6 +33,10 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -305,6 +310,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
         private final String mEmail;
         private final String mPassword;
+        private JSONObject result;
 
         UserLoginTask(String email, String password) {
             mEmail = email;
@@ -312,50 +318,58 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         }
 
         @Override
-        protected Boolean doInBackground(Void... params) {
-            // TODO: attempt authentication against a network service.
-            // TODO: the server must be setup.
-
+        protected Boolean doInBackground(Void... params)
+        {
             try {
-                // Simulate network access.
-            String response = requester.sendAccident(currentLocation);
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
+                JSONObject response = requester.login(mEmail,mPassword);
+                if (response != null){
+                    String auth = response.getString("auth");
+
+
+                    if (auth.equals("success")){
+                        result  = response;
+                        return true;
+                    }
+                    else if (auth.equals("fail")){
+                        return false;
+                    }
+                }
+            } catch(IOException e){
+                Log.e("LOGIN","IO error");
+                return false;
+            }catch(JSONException e){
+                Log.e("LOGIN","JSON error");
                 return false;
             }
-            /*just for testing*/
-            /*if user registers locally, add their account locally also*/
-            for (String credential : DUMMY_CREDENTIALS) {
-                String[] pieces = credential.split(":");
-                if (pieces[0].equals(mEmail)) {
-                    // Account exists, return true if the password matches.
-                    return pieces[1].equals(mPassword);
-                }
-            }
-
-            // TODO: register the new account here.
-            return true;
+            return false;
         }
         Context context = LoginActivity.this;
         @Override
-        protected void onPostExecute(final Boolean success) {
+        protected void onPostExecute(final Boolean success)
+        {
             mAuthTask = null;
             showProgress(false);
 
             if (success) {
-                 intent = new Intent(context, MainActivity.class);
-                //user_id should be returned by the service
-                intent.putExtra(USER_ID, 14);
-                startActivity(intent);
-                Toast.makeText(context, R.string.login_successful, Toast.LENGTH_LONG).show();
 
-                finish();
+                String id;
+                String username;
+                 intent = new Intent(context, MainActivity.class);
+                try{
+                    intent.putExtra(USER_ID, result.getString("id"));
+                    intent.putExtra("username", result.getString("username"));
+                    startActivity(intent);
+                    Toast.makeText(context, R.string.login_successful, Toast.LENGTH_LONG).show();
+                    finish();
+                }catch(JSONException e){
+
+                }
+
             } else {
                 mPasswordView.setError(getString(R.string.error_incorrect_password));
                 mPasswordView.requestFocus();
             }
         }
-
         @Override
         protected void onCancelled() {
             mAuthTask = null;
