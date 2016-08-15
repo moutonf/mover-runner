@@ -76,28 +76,6 @@ public class Requests {
 //            return ("A problem occurred");
 //        }
 //    }
-    /*POST requests*/
-    /*The server currently checks id and msg arguments*/
-//    String post(String url, Location location) throws IOException {
-//
-//        String latitude = String.valueOf(location.getLatitude());
-//        String longitude = String.valueOf(location.getLongitude());
-//
-//        RequestBody formBody = new FormBody.Builder()
-//                .add("id", "gavin")
-//                .add("message", "this is a message from gavin")
-//                .add("latitude",latitude)
-//                .add("longitude",longitude)
-//                .build();
-////        RequestBody body = RequestBody.create(JSON, json);
-//        Request request = new Request.Builder()
-//                .url(url)
-//                .post(formBody)
-//                .build();
-//        Response response = client.newCall(request).execute();
-//        return response.body().string();
-//    }
-
     public JSONObject login(String email, String password) throws IOException
     {
         RequestBody formBody = new FormBody.Builder()
@@ -112,7 +90,6 @@ public class Requests {
         return call(request);
 
     }
-
     public JSONObject register(String email, String password, String passwordConfirm) throws IOException
     {
         RequestBody formBody = new FormBody.Builder()
@@ -125,7 +102,6 @@ public class Requests {
                 .post(formBody)
                 .build();
         return call(request);
-
     }
 //    public String sendAccident(Location location) {
 //        String response;

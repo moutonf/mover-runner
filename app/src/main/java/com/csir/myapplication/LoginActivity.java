@@ -31,6 +31,8 @@ public class LoginActivity extends AppCompatActivity {
     private Requests requester;
 
     public final static String USER_ID = "USER_ID";
+    public final static String USERNAME = "USERNAME";
+
     /**
      * Keep track of the login task to ensure we can cancel it if requested.
      */
@@ -38,6 +40,8 @@ public class LoginActivity extends AppCompatActivity {
     // UI references.
     private AutoCompleteTextView mEmailView;
     private EditText mPasswordView;
+    private EditText mPasswordConfirmView;
+
     private View mProgressView;
     private View mLoginFormView;
 
@@ -54,6 +58,8 @@ public class LoginActivity extends AppCompatActivity {
         mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
 
         mPasswordView = (EditText) findViewById(R.id.password);
+        mPasswordConfirmView = (EditText) findViewById(R.id.password_confirm);
+
         requester = new Requests();
 
         Button mEmailSignInButton = (Button) findViewById(R.id.email_sign_in_button);
@@ -67,7 +73,7 @@ public class LoginActivity extends AppCompatActivity {
         mRegisterButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-//                attemptAuthentication(REGISTER_URL);
+                attemptAuthentication(REGISTER_URL);
             }
         });
 
@@ -92,18 +98,12 @@ public class LoginActivity extends AppCompatActivity {
         // Store values at the time of the login attempt.
         String email = mEmailView.getText().toString();
         String password = mPasswordView.getText().toString();
+        String passwordConfirm = mPasswordConfirmView.getText().toString();
 
         boolean cancel = false;
         View focusView = null;
 
-        // If the password isn't empty, check if it is valid Check for a valid password, if the user entered one.
-        if (!TextUtils.isEmpty(password) && !isPasswordValid(password)) {
-            mPasswordView.setError(getString(R.string.error_invalid_password));
-            focusView = mPasswordView;
-            cancel = true;
-        }
-
-        // Check for a valid email address.
+        // 1. Check for a valid email address.
         if (TextUtils.isEmpty(email)) {
             mEmailView.setError(getString(R.string.error_field_required));
             focusView = mEmailView;
@@ -113,6 +113,21 @@ public class LoginActivity extends AppCompatActivity {
             focusView = mEmailView;
             cancel = true;
         }
+        // 2. If the password isn't empty, check if it is valid Check for a valid password, if the user entered one.
+        if (!TextUtils.isEmpty(password) && !isPasswordValid(password)) {
+            mPasswordView.setError(getString(R.string.error_invalid_password));
+            focusView = mPasswordView;
+            cancel = true;
+        }
+        // 3. If register, confirm passwords
+        if (auth.equals(REGISTER_URL)){
+            if (!password.equals(passwordConfirm)){
+                mPasswordView.setError(getString(R.string.error_no_match_password));
+                focusView = mPasswordView;
+                cancel = true;
+            }
+        }
+
         if (cancel) {
             // There was an error; don't attempt login and focus the first
             // form field with an error.
@@ -123,12 +138,12 @@ public class LoginActivity extends AppCompatActivity {
             showProgress(true);
             if (auth.equals(LOGIN_URL)){
                 Log.i(TAG, "Login");
-                mAuthTask = new UserAuthTask(email, password, "",LOGIN_URL);
+                mAuthTask = new UserAuthTask(email, password, null,LOGIN_URL);
                 mAuthTask.execute((Void) null);
             }
             if (auth.equals(REGISTER_URL)){
                 Log.i(TAG, "Register");
-                mAuthTask = new UserAuthTask(email, password, "", REGISTER_URL);
+                mAuthTask = new UserAuthTask(email, password, passwordConfirm, REGISTER_URL);
                 mAuthTask.execute((Void) null);
             }
         }
