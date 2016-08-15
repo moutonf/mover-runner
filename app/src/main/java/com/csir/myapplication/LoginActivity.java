@@ -6,28 +6,21 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
-import android.app.LoaderManager.LoaderCallbacks;
-
-import android.database.Cursor;
 import android.os.AsyncTask;
 
 import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.inputmethod.EditorInfo;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.io.IOException;
 
 /**
@@ -41,13 +34,17 @@ public class LoginActivity extends AppCompatActivity {
     /**
      * Keep track of the login task to ensure we can cancel it if requested.
      */
-    private UserLoginTask mAuthTask = null;
 
     // UI references.
     private AutoCompleteTextView mEmailView;
     private EditText mPasswordView;
     private View mProgressView;
     private View mLoginFormView;
+
+    private UserAuthTask mAuthTask = null;
+    private static final String REGISTER_URL = "REGISTER";
+    private static final String LOGIN_URL = "LOGIN";
+    private static final String TAG = "MOVER_LOGIN";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,23 +54,20 @@ public class LoginActivity extends AppCompatActivity {
         mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
 
         mPasswordView = (EditText) findViewById(R.id.password);
-        mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
-                if (id == R.id.login || id == EditorInfo.IME_NULL) {
-                    attemptLogin();
-                    return true;
-                }
-                return false;
-            }
-        });
         requester = new Requests();
 
         Button mEmailSignInButton = (Button) findViewById(R.id.email_sign_in_button);
         mEmailSignInButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                attemptLogin();
+                attemptAuthentication(LOGIN_URL);
+            }
+        });
+        Button mRegisterButton = (Button) findViewById(R.id.email_register_button);
+        mRegisterButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+//                attemptAuthentication(REGISTER_URL);
             }
         });
 
@@ -86,11 +80,11 @@ public class LoginActivity extends AppCompatActivity {
      * If there are form errors (invalid email, missing fields, etc.), the
      * errors are presented and no actual login attempt is made.
      */
-    private void attemptLogin() {
+    private void attemptAuthentication(String auth) {
         if (mAuthTask != null) {
             return;
         }
-
+        Log.i(TAG,"Clicked");
         // Reset errors.
         mEmailView.setError(null);
         mPasswordView.setError(null);
@@ -127,8 +121,16 @@ public class LoginActivity extends AppCompatActivity {
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
             showProgress(true);
-            mAuthTask = new UserLoginTask(email, password);
-            mAuthTask.execute((Void) null);
+            if (auth.equals(LOGIN_URL)){
+                Log.i(TAG, "Login");
+                mAuthTask = new UserAuthTask(email, password, "",LOGIN_URL);
+                mAuthTask.execute((Void) null);
+            }
+            if (auth.equals(REGISTER_URL)){
+                Log.i(TAG, "Register");
+                mAuthTask = new UserAuthTask(email, password, "", REGISTER_URL);
+                mAuthTask.execute((Void) null);
+            }
         }
     }
 
@@ -182,22 +184,34 @@ public class LoginActivity extends AppCompatActivity {
      * Represents an asynchronous login/registration task used to authenticate
      * the user.
      */
-    public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
+    public class UserAuthTask extends AsyncTask<Void, Void, Boolean> {
 
         private final String mEmail;
         private final String mPassword;
+        private final String mPasswordConfirm;
+        private String mAuth;
+
         private JSONObject result;
 
-        UserLoginTask(String email, String password) {
+        UserAuthTask(String email, String password, String passwordConfirm, String auth) {
             mEmail = email;
             mPassword = password;
+            mPasswordConfirm = passwordConfirm;
+            mAuth = auth;
         }
-
         @Override
         protected Boolean doInBackground(Void... params)
-        {
+        {JSONObject response = null;
             try {
-                JSONObject response = requester.login(mEmail,mPassword);
+                if (mAuth.toUpperCase().equals(LOGIN_URL)){
+                    Log.i(TAG, "Login");
+                    response = requester.login(mEmail, mPassword);
+                }
+                if (mAuth.toUpperCase().equals(REGISTER_URL)){
+                    Log.i(TAG, "Register");
+                    response = requester.register(mEmail, mPassword, mPasswordConfirm);
+                }
+
                 if (response != null){
                     String auth = response.getString("auth");
                     if (auth.equals("success")){
@@ -226,9 +240,7 @@ public class LoginActivity extends AppCompatActivity {
 
             if (success) {
 
-                String id;
-                String username;
-                 intent = new Intent(context, MainActivity.class);
+                intent = new Intent(context, MainActivity.class);
                 try{
                     intent.putExtra(USER_ID, result.getString("id"));
                     intent.putExtra("username", result.getString("username"));
