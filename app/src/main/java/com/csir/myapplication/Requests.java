@@ -33,7 +33,9 @@ public class Requests {
 
     public static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
     private static final String TAG = "CONNECTION";
-    final String POST_DEV_URL = "http://10.0.0.6:5000";
+//    final String POST_DEV_URL = "http://10.0.0.6:5000";
+    final String POST_DEV_URL = "http://139.162.178.79:4000";
+
 //    final String POST_BASE_URL =
 //            "http://moutonf.co.za:5000/post-api";
 //    final String GET_BASE_URL =
