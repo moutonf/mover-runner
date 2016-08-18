@@ -16,6 +16,7 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.Date;
 
 import okhttp3.FormBody;
 import okhttp3.OkHttpClient;
@@ -38,7 +39,7 @@ public class Requests {
 
     final String LOGIN = "login";
     final String REGISTER = "register";
-
+    final String ACCIDENT = "accident";
     public Requests(){
         client  = new OkHttpClient();
         /*Requests should be async, this is dirty*/
@@ -99,6 +100,23 @@ public class Requests {
                 .build();
         Request request = new Request.Builder()
                 .url(POST_DEV_URL + "/" + REGISTER)
+                .post(formBody)
+                .build();
+        return call(request);
+    }
+
+    public JSONObject sendAccident(String type, double longitude, double latitude, Date timeOfAccident, int userId ) throws IOException
+    {
+        long unixTimestamp = timeOfAccident.getTime()/1000; //unix timestamp is defined in seconds, not milliseconds
+        RequestBody formBody = new FormBody.Builder()
+                .add("type", type)
+                .add("longitude", String.format("%.3f",longitude))
+                .add("latitude", String.format("%.3f",latitude))
+                .add("time-of-accident", String.valueOf(unixTimestamp))
+                .add("userId", String.valueOf(userId))
+                .build();
+        Request request = new Request.Builder()
+                .url(POST_DEV_URL + "/" + ACCIDENT)
                 .post(formBody)
                 .build();
         return call(request);

@@ -261,6 +261,9 @@ public class RunnerMan extends FragmentActivity implements SensorDisplayFragment
         finish();
     }
 
+
+
+
     @Override
     public void onBackPressed() {
         super.onBackPressed();

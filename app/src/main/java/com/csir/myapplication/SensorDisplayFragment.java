@@ -12,10 +12,15 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -91,6 +96,18 @@ public class SensorDisplayFragment extends Fragment implements SensorEventListen
         sensorInfo = (TextView) view.findViewById(R.id.sensor_info);
         sensorMax = (TextView) view.findViewById(R.id.accelerometer_max);
         mFlParent  = (LinearLayout) view.findViewById(R.id.fl_frag_sensor_display_parent);
+        Button mSendAccident = (Button) view.findViewById(R.id.send_accident);
+        mSendAccident.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                try{
+                    sendAccident(view);
+                }catch(Exception e){
+
+                }
+
+            }
+        });
         return view;
     }
 
@@ -127,6 +144,7 @@ public class SensorDisplayFragment extends Fragment implements SensorEventListen
         mSensorManager = (SensorManager) getActivity().getSystemService(Context.SENSOR_SERVICE);
         activity = (RunnerMan)getActivity();
         log = new LoggingService(view.getContext());
+
 
         /*Get potentially useful sensors*/
         mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
@@ -267,6 +285,14 @@ public class SensorDisplayFragment extends Fragment implements SensorEventListen
             }
         }
         isAccident(magnitude);
+    }
+
+    public void sendAccident(View view) throws IOException, JSONException
+    {Location currentLocation = activity.getLocation();
+        JSONObject response = requester.sendAccident("runner",currentLocation.getLatitude(),currentLocation.getLongitude(), new Date(), 5);
+        Toast.makeText(activity, response.getString("result"),
+                Toast.LENGTH_LONG).show();
+
     }
 
     private boolean isAccident(double magnitude){
