@@ -160,6 +160,13 @@ public class LoginActivity extends AppCompatActivity {
         return true;
     }
 
+    public void bypass(View view) {
+        intent = new Intent(this, MainActivity.class);
+        intent.putExtra(USER_ID, "5");
+        intent.putExtra("username", "name");
+        startActivity(intent);
+
+    }
     /**
      * Shows the progress UI and hides the login form.
      */

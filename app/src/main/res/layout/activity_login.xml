@@ -75,8 +75,18 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:text="@string/action_register_short"
-                android:textStyle="bold" />
+                android:text="@string/action_register_short"/>
+
+
+            <Button
+                android:id="@+id/bypass"
+                style="?android:textAppearanceSmall"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="@string/bypass"
+                android:textStyle="bold"
+                android:onClick="bypass"/>
 
         </LinearLayout>
     </ScrollView>
