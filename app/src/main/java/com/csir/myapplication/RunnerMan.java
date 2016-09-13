@@ -1,10 +1,12 @@
 package com.csir.myapplication;
 
+import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
 import android.net.Uri;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
 import android.os.Bundle;
@@ -90,9 +92,12 @@ public class RunnerMan extends FragmentActivity implements SensorDisplayFragment
             SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                     .findFragmentById(R.id.map);
             mapFragment.getMapAsync(this);
-
             buildGoogleApiClient();
+
         }
+    private boolean mapSetup = false;
+
+
 
     public String getUsername(){
         return username;
