@@ -68,7 +68,6 @@ public class RunnerMan extends FragmentActivity implements SensorDisplayFragment
             userID = intent.getStringExtra(getString(R.string.USER_ID_EXTRA));
             username = intent.getStringExtra(getString(R.string.USERNAME_EXTRA));
 
-
             mapReady = false;
             mRequestingLocationUpdates = true;
 
@@ -94,6 +93,15 @@ public class RunnerMan extends FragmentActivity implements SensorDisplayFragment
 
             buildGoogleApiClient();
         }
+
+    public String getUsername(){
+        return username;
+    }
+
+    public String getUserID(){
+        return userID;
+    }
+
     public void onSensorFragmentInteraction(Uri uri){
         /*sensor shouldn't require any input from location, unless coordinates*/
     }

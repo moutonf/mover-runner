@@ -73,6 +73,9 @@ public class SensorDisplayFragment extends Fragment implements SensorEventListen
     float[] gravity;
     Double maxMagnitude;
 
+    private String username;
+    private String userID;
+
     private LinearLayout mFlParent;
 
     public SensorDisplayFragment() {
@@ -144,7 +147,8 @@ public class SensorDisplayFragment extends Fragment implements SensorEventListen
         mSensorManager = (SensorManager) getActivity().getSystemService(Context.SENSOR_SERVICE);
         activity = (RunnerMan)getActivity();
         log = new LoggingService(view.getContext());
-
+        username = activity.getUsername();
+        userID = activity.getUserID();
 
         /*Get potentially useful sensors*/
         mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
@@ -289,7 +293,7 @@ public class SensorDisplayFragment extends Fragment implements SensorEventListen
 
     public void sendAccident(View view) throws IOException, JSONException
     {Location currentLocation = activity.getLocation();
-        JSONObject response = requester.sendAccident("runner",currentLocation.getLatitude(),currentLocation.getLongitude(), new Date(), 5);
+        JSONObject response = requester.sendAccident("runner",currentLocation.getLatitude(),currentLocation.getLongitude(), new Date(), Integer.parseInt(userID));
         Toast.makeText(activity, response.getString("result"),
                 Toast.LENGTH_LONG).show();
 
