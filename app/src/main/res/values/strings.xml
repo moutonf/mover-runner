@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">MOVER</string>
+    <string name="app_name">Mover Runner</string>
     <!--REQUEST LABELS-->
     <string name="get">GET</string>
     <string name="post">POST</string>
@@ -37,7 +37,7 @@
 
     <!--RUNNER-->
     <string name="activity_runner">Runner Application</string>
-    <string name="title_activity_login">Sign in</string>
+    <string name="title_activity_login">Mover - Login</string>
 
     <!-- Strings related to login -->
     <string name="prompt_email">Email</string>
