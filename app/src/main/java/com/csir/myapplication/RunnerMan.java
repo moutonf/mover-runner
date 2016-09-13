@@ -1,5 +1,6 @@
 package com.csir.myapplication;
 
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
@@ -49,6 +50,11 @@ public class RunnerMan extends FragmentActivity implements SensorDisplayFragment
     float transparency = 0.5f;
     LatLng location;
 
+    /*Intent Extras*/
+
+    private String userID;
+    private String username;
+
     /*DISPLAY VARIABLES*/
         protected String mLatitudeLabel, mLongitudeLabel,mUpdateTimeLabel,mSpeedLabel, mDistanceLabel,mLastUpdateTime;
         protected TextView mLatitudeText,mLongitudeText,mSpeedText, mDistanceText,mLastUpdateTimeText ;
@@ -57,6 +63,11 @@ public class RunnerMan extends FragmentActivity implements SensorDisplayFragment
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             setContentView(R.layout.activity_runner_man);
+
+            Intent intent = getIntent();
+            userID = intent.getStringExtra(getString(R.string.USER_ID_EXTRA));
+            username = intent.getStringExtra(getString(R.string.USERNAME_EXTRA));
+
 
             mapReady = false;
             mRequestingLocationUpdates = true;

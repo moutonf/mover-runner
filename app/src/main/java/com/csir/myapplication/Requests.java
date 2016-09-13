@@ -46,7 +46,6 @@ public class Requests {
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
     }
-
     private JSONObject call(Request request) throws IOException {
         JSONObject result;
         try{
@@ -62,21 +61,6 @@ public class Requests {
         Log.i(TAG, result.toString());
         return result;
     }
-//    public String getRequest() {
-//        String response;
-//        try {
-//            Uri builtUri = Uri.parse(POST_DEV_URL)
-//                    .buildUpon()
-//                    .appendQueryParameter(ID_PARAM, "get-id")
-//                    .appendQueryParameter(MESSAGE_PARAM, "get-message")
-//                    .build();
-//            response = run(builtUri.toString());
-//            return response;
-//        }catch(IOException ex){
-////            ex.printStackTrace();
-//            return ("A problem occurred");
-//        }
-//    }
     public JSONObject login(String email, String password) throws IOException
     {
         RequestBody formBody = new FormBody.Builder()
@@ -121,18 +105,4 @@ public class Requests {
                 .build();
         return call(request);
     }
-//    public String sendAccident(Location location) {
-//        String response;
-//        try {
-//        //MUST BUILD A JSON
-//            response =  post("http://moutonf.co.za:5000/accident", location);
-//            return response;
-//        }catch(IOException ex){
-//            ex.printStackTrace();
-//            return ("A problem occurred");
-//        }
-//
-//    }
-
-
 }

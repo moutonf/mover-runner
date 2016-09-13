@@ -58,4 +58,8 @@
         completions."
     </string>
 
+    <!--INTENT EXTRAS-->
+    <string name="USER_ID_EXTRA">USER_ID</string>
+    <string name="USERNAME_EXTRA">USERNAME</string>
+
 </resources>

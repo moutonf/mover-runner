@@ -30,8 +30,7 @@ public class LoginActivity extends AppCompatActivity {
     Intent intent;
     private Requests requester;
 
-    public final static String USER_ID = "USER_ID";
-    public final static String USERNAME = "USERNAME";
+
 
     /**
      * Keep track of the login task to ensure we can cancel it if requested.
@@ -256,8 +255,8 @@ public class LoginActivity extends AppCompatActivity {
 
                 intent = new Intent(context, MainActivity.class);
                 try{
-                    intent.putExtra(USER_ID, result.getString("id"));
-                    intent.putExtra("username", result.getString("username"));
+                    intent.putExtra(getString(R.string.USER_ID_EXTRA), result.getString("id"));
+                    intent.putExtra(getString(R.string.USERNAME_EXTRA), result.getString("username"));
                     startActivity(intent);
                     Toast.makeText(context, R.string.login_successful, Toast.LENGTH_LONG).show();
                     finish();
