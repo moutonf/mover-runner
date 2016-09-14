@@ -232,15 +232,18 @@ public class SensorDisplayFragment extends Fragment implements SensorEventListen
     public final void onSensorChanged(SensorEvent event) {
         /*Low-pass filter values*/
         date2 = new Date();
-        sensorName = event.sensor.getName();
 
-        /*Only accelerometer is low-passed*/
-        filterValues = lowPass(event.values.clone(), filterValues);
+        sensorName = event.sensor.getName();
         sensor = (TextView)sensorTextViews.get(sensorName);
+
         if (sensor != null){
 
             /*Accelerometer is the most important sensor as it is low-passed and magnitude is calculated*/
             if (sensorName.toUpperCase().equals("ACCELEROMETER")){
+
+                /*Only accelerometer is low-passed*/
+                filterValues = lowPass(event.values.clone(), filterValues);
+
                 if (gravity==null){
                     Log.d(TAG,"Setting initial gravity values");
                     gravity = filterValues;
