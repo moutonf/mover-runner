@@ -17,6 +17,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.crashlytics.android.Crashlytics;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -43,9 +45,9 @@ public class SensorDisplayFragment extends Fragment implements SensorEventListen
 
     LoggingService log;
     private SensorManager mSensorManager;
+    private static final String SENSOR_SERVICE_TAG = "SENSOR SERVICE";
     private static final String TAG = "MOVER_SENSOR";
     private TextView sensorInfo,sensorMax;
-
     private Sensor mAccelerometer;
     private Sensor mGyro;
     private Sensor mLight;
@@ -76,6 +78,7 @@ public class SensorDisplayFragment extends Fragment implements SensorEventListen
     private String username;
     private String userID;
 
+    List<Sensor> allSensors;
     private LinearLayout mFlParent;
 
     public SensorDisplayFragment() {
@@ -150,7 +153,13 @@ public class SensorDisplayFragment extends Fragment implements SensorEventListen
         username = activity.getUsername();
         userID = activity.getUserID();
 
-        /*Get potentially useful sensors*/
+
+        allSensors =  mSensorManager.getSensorList(Sensor.TYPE_ALL);
+        for (Sensor s: allSensors){
+            Log.i(SENSOR_SERVICE_TAG,s.getName());
+        }
+        allSensors =  mSensorManager.getSensorList(Sensor.TYPE_ALL);
+        /*UNCALIBRATED_GYROSCOPE and ROTATION_VECTOR > 4 event values*/
         mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         mGyro = mSensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
         mLight = mSensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
@@ -223,12 +232,14 @@ public class SensorDisplayFragment extends Fragment implements SensorEventListen
     public final void onSensorChanged(SensorEvent event) {
         /*Low-pass filter values*/
         date2 = new Date();
-        filterValues = lowPass(event.values.clone(), filterValues);
         sensorName = event.sensor.getName();
-        Log.i(TAG, "Sensor: " + sensorName);
-        Log.i(TAG, "Timestamp: " + event.timestamp);
+
+        /*Only accelerometer is low-passed*/
+        filterValues = lowPass(event.values.clone(), filterValues);
         sensor = (TextView)sensorTextViews.get(sensorName);
         if (sensor != null){
+
+            /*Accelerometer is the most important sensor as it is low-passed and magnitude is calculated*/
             if (sensorName.toUpperCase().equals("ACCELEROMETER")){
                 if (gravity==null){
                     Log.d(TAG,"Setting initial gravity values");
@@ -239,6 +250,7 @@ public class SensorDisplayFragment extends Fragment implements SensorEventListen
                 gravity[1] = GRAVITY_ALPHA * gravity[1] + (1 - GRAVITY_ALPHA) * event.values[1];
                 gravity[2] = GRAVITY_ALPHA * gravity[2] + (1 - GRAVITY_ALPHA) * event.values[2];
 
+                /*Establish linear values without the affect of gravity*/
                 float linearX = event.values[0] - gravity[0];
                 float linearY = event.values[1] - gravity[1];
                 float linearZ = event.values[2] - gravity[2];
@@ -271,24 +283,31 @@ public class SensorDisplayFragment extends Fragment implements SensorEventListen
                         maxZ = linearZ;
                     }
                 }
-                /*only write values to log every five seconds to minimize size and IO*/
-                if ((date2.getTime() - date1.getTime()) > 5000 ){
+                /*only write values to log every 20 seconds to minimize size and IO*/
+                if ((date2.getTime() - date1.getTime()) > 20000 ){
                     Log.d(TAG,"Write log @ " + date2.getTime());
-
                     log.writeLog(TAG,String.format("X,%f,Y,%f,Z%f,Max,X,%f,Y,%f,Z,%f, Magnitude, %f",linearX,linearY,linearZ,maxX,maxY,maxZ, magnitude ));
                     date1 = date2;
                 }
                 sensorMax.setText(String.format("maxX: %f | maxY: %f | maxZ: %f | magnitude: %f",maxX,maxY,maxZ, maxMagnitude));
-            }
-            sensor.setText(String.valueOf(sensorName +": "));
-            for (int i = 0; i < filterValues.length; i++){
-                sensor.append(
-                        String.valueOf(f.format(event.values[i] - gravity[i]) + " ")
-                );
-//                sensor.append(String.valueOf(event.values[i] + " "));
+                isAccident(magnitude);
+
+                sensor.setText(String.valueOf(sensorName +": "));
+                for (int i = 0; i < filterValues.length; i++){
+                    if (sensorName.toUpperCase().equals("ACCELEROMETER")){
+                    }
+                    sensor.append(
+                            String.valueOf(f.format(event.values[i] - gravity[i]) + " ")
+                    );
+                }
+            }else{
+                //Non-accelerometer values; unfiltered
+                sensor.setText(String.valueOf(sensorName +": "));
+                for (int i = 0; i < event.values.length; i++){
+                    sensor.append(String.valueOf(event.values[i]) + " ");
+                }
             }
         }
-        isAccident(magnitude);
     }
 
     public void sendAccident(View view) throws IOException, JSONException
@@ -310,8 +329,6 @@ public class SensorDisplayFragment extends Fragment implements SensorEventListen
 //            String response = requester.sendAccident(currentLocation);
             return true;
         }
-
-
         return false;
     }
     /*Received at the same time as the activity*/
