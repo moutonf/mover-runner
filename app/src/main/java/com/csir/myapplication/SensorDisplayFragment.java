@@ -152,11 +152,11 @@ public class SensorDisplayFragment extends Fragment implements SensorEventListen
 
         /*Get potentially useful sensors*/
         mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        mGyro = mSensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
+//        mGyro = mSensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
         mLight = mSensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
-        mLinearAcceleration = mSensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
-        mRotationVector = mSensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
-        mSignificantMotion = mSensorManager.getDefaultSensor(Sensor.TYPE_SIGNIFICANT_MOTION);
+//        mLinearAcceleration = mSensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
+//        mRotationVector = mSensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
+//        mSignificantMotion = mSensorManager.getDefaultSensor(Sensor.TYPE_SIGNIFICANT_MOTION);
 
         deviceSensors = new ArrayList<Sensor>();
         //A list of all potentially useful sensors
@@ -166,7 +166,7 @@ public class SensorDisplayFragment extends Fragment implements SensorEventListen
         }
         if (mGyro != null){
             Log.i(TAG, "Gyro sensor added");
-            deviceSensors.add(mGyro);
+//            deviceSensors.add(mGyro);
         }
         if (mLight != null){
             Log.i(TAG, "Light sensor added");
@@ -174,15 +174,15 @@ public class SensorDisplayFragment extends Fragment implements SensorEventListen
         }
         if (mLinearAcceleration != null){
             Log.i(TAG, "Linear Acceleration sensor added");
-            deviceSensors.add(mLinearAcceleration);
+//            deviceSensors.add(mLinearAcceleration);
         }
         if (mRotationVector != null){
             Log.i(TAG, "Roation Vector sensor added");
-            deviceSensors.add(mRotationVector);
+//            deviceSensors.add(mRotationVector);
         }
         if (mSignificantMotion != null){
             Log.i(TAG, "Significant Motion sensor added");
-            deviceSensors.add(mSignificantMotion);
+//            deviceSensors.add(mSignificantMotion);
         }
 
         lparams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT );
@@ -282,10 +282,20 @@ public class SensorDisplayFragment extends Fragment implements SensorEventListen
             }
             sensor.setText(String.valueOf(sensorName +": "));
             for (int i = 0; i < filterValues.length; i++){
+                if (sensorName.toUpperCase().equals("ACCELEROMETER")){
+                }
                 sensor.append(
                         String.valueOf(f.format(event.values[i] - gravity[i]) + " ")
                 );
-//                sensor.append(String.valueOf(event.values[i] + " "));
+
+                //Ignore not accelerometer values for now
+//                else{
+//                    sensor.append(
+//
+//                            String.valueOf(f.format(event.values[i] + " ")
+//                    ));
+//                }
+
             }
         }
         isAccident(magnitude);
