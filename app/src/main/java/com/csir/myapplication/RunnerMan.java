@@ -31,6 +31,10 @@ import java.text.DateFormat;
 import java.util.Date;
 import java.util.Locale;
 
+import butterknife.BindString;
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 public class RunnerMan extends FragmentActivity implements SensorDisplayFragment.OnSensorFragmentInteractionListener, OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener, LocationListener {
 
@@ -55,9 +59,20 @@ public class RunnerMan extends FragmentActivity implements SensorDisplayFragment
     private String userID;
     private String username;
 
-    /*DISPLAY VARIABLES*/
-        protected String mLatitudeLabel, mLongitudeLabel,mUpdateTimeLabel,mSpeedLabel, mDistanceLabel,mLastUpdateTime;
-        protected TextView mLatitudeText,mLongitudeText,mSpeedText, mDistanceText,mLastUpdateTimeText ;
+    @BindView(R.id.distance_text) TextView mDistanceText;
+    @BindView(R.id.latitude_text) TextView mLatitudeText;
+    @BindView(R.id.longitude_text) TextView mLongitudeText;
+    @BindView(R.id.speed_text) TextView mSpeedText;
+    @BindView(R.id.last_update_time) TextView mLastUpdateTimeText;
+
+    @BindString(R.string.latitude_label) String mLatitudeLabel;
+    @BindString(R.string.longitude_label) String mLongitudeLabel;
+    @BindString(R.string.update_time_label) String mUpdateTimeLabel;
+    @BindString(R.string.speed_label) String mSpeedLabel;
+    @BindString(R.string.distance_label) String mDistanceLabel;
+
+     /*DISPLAY VARIABLES*/
+    protected String mLastUpdateTime;
 
         @Override
         public void onCreate(Bundle savedInstanceState) {
@@ -72,18 +87,9 @@ public class RunnerMan extends FragmentActivity implements SensorDisplayFragment
             mRequestingLocationUpdates = true;
 
             this.findViewById(android.R.id.content).setKeepScreenOn(true);
-            /*DISPLAY LABELS AND TEXT BOXES*/
-            mLatitudeLabel = getResources().getString(R.string.latitude_label);
-            mLongitudeLabel = getResources().getString(R.string.longitude_label);
-            mUpdateTimeLabel = getResources().getString(R.string.update_time_label);
-            mSpeedLabel = getResources().getString(R.string.speed_label);
-            mDistanceLabel = getResources().getString(R.string.distance_label);
-            mDistanceText= (TextView) findViewById((R.id.distance_text));
-            mLatitudeText = (TextView) findViewById((R.id.latitude_text));
-            mLongitudeText = (TextView) findViewById((R.id.longitude_text));
-            mLastUpdateTimeText = (TextView) findViewById((R.id.last_update_time));
-            mSpeedText = (TextView) findViewById((R.id.speed_text));
-            /****************/
+
+            ButterKnife.bind(this);
+
             deviceLocale = Locale.getDefault();
 
             // Obtain the SupportMapFragment and get notified when the map is ready to be used.
