@@ -29,6 +29,9 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
@@ -47,7 +50,10 @@ public class SensorDisplayFragment extends Fragment implements SensorEventListen
     private SensorManager mSensorManager;
     private static final String SENSOR_SERVICE_TAG = "SENSOR SERVICE";
     private static final String TAG = "MOVER_SENSOR";
-    private TextView sensorInfo,sensorMax;
+
+    @BindView (R.id.accelerometer_max)TextView sensorMax;
+    @BindView(R.id.sensor_info) TextView sensorInfo;
+
     private Sensor mAccelerometer;
     private Sensor mGyro;
     private Sensor mLight;
@@ -99,8 +105,7 @@ public class SensorDisplayFragment extends Fragment implements SensorEventListen
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         view = inflater.inflate(R.layout.fragment_sensor_display, container, false);
-        sensorInfo = (TextView) view.findViewById(R.id.sensor_info);
-        sensorMax = (TextView) view.findViewById(R.id.accelerometer_max);
+        ButterKnife.bind(view);
         mFlParent  = (LinearLayout) view.findViewById(R.id.fl_frag_sensor_display_parent);
         Button mSendAccident = (Button) view.findViewById(R.id.send_accident);
         mSendAccident.setOnClickListener(new View.OnClickListener() {
