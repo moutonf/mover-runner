@@ -1,0 +1,10 @@
+18 September 2016
+---
+
+Low-pass filtering with 0.25 alpha
+Logging every five seconds
+holding while walking
+5 sessions of average 4:45
+
+
+

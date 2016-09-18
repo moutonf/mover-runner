@@ -21,6 +21,7 @@ import com.crashlytics.android.Crashlytics;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
 import java.io.IOException;
 import java.text.DecimalFormat;
@@ -51,9 +52,6 @@ public class SensorDisplayFragment extends Fragment implements SensorEventListen
     private static final String SENSOR_SERVICE_TAG = "SENSOR SERVICE";
     private static final String TAG = "MOVER_SENSOR";
 
-    @BindView (R.id.accelerometer_max)TextView sensorMax;
-    @BindView(R.id.sensor_info) TextView sensorInfo;
-
     private Sensor mAccelerometer;
     private Sensor mGyro;
     private Sensor mLight;
@@ -77,7 +75,6 @@ public class SensorDisplayFragment extends Fragment implements SensorEventListen
     String sensorName;
     TextView sensor;
     DecimalFormat f = new DecimalFormat("0.000");
-    Date date1,date2;
     float[] gravity;
     Double maxMagnitude;
 
@@ -100,12 +97,13 @@ public class SensorDisplayFragment extends Fragment implements SensorEventListen
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
     }
+    TextView sensorMax;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         view = inflater.inflate(R.layout.fragment_sensor_display, container, false);
-        ButterKnife.bind(view);
+        sensorMax = (TextView)view.findViewById(R.id.accelerometer_max);
         mFlParent  = (LinearLayout) view.findViewById(R.id.fl_frag_sensor_display_parent);
         Button mSendAccident = (Button) view.findViewById(R.id.send_accident);
         mSendAccident.setOnClickListener(new View.OnClickListener() {
@@ -121,7 +119,6 @@ public class SensorDisplayFragment extends Fragment implements SensorEventListen
         });
         return view;
     }
-
     /*Enforces the interface*/
     @Override
     public void onAttach(Context context) {
@@ -154,7 +151,7 @@ public class SensorDisplayFragment extends Fragment implements SensorEventListen
         super.onActivityCreated(savedInstanceState);
         mSensorManager = (SensorManager) getActivity().getSystemService(Context.SENSOR_SERVICE);
         activity = (RunnerMan)getActivity();
-        log = new LoggingService(view.getContext());
+        log = new LoggingService(view.getContext(), "SENSORS");
         username = activity.getUsername();
         userID = activity.getUserID();
 
@@ -212,7 +209,6 @@ public class SensorDisplayFragment extends Fragment implements SensorEventListen
         }
         requester = new Requests();
         maxMagnitude = null;
-        date1 = new Date();
     }
 
     /*Ref: https://github.com/Bhide/Low-Pass-Filter-To-Android-Sensors*/
@@ -236,10 +232,9 @@ public class SensorDisplayFragment extends Fragment implements SensorEventListen
     @Override
     public final void onSensorChanged(SensorEvent event) {
         /*Low-pass filter values*/
-        date2 = new Date();
-
         sensorName = event.sensor.getName();
         sensor = (TextView)sensorTextViews.get(sensorName);
+        sensor.setText(String.valueOf(sensorName +": "));
 
         if (sensor != null){
 
@@ -292,25 +287,19 @@ public class SensorDisplayFragment extends Fragment implements SensorEventListen
                     }
                 }
                 /*only write values to log every 20 seconds to minimize size and IO*/
-                if ((date2.getTime() - date1.getTime()) > 20000 ){
-                    Log.d(TAG,"Write log @ " + date2.getTime());
-                    log.writeLog(TAG,String.format("X,%f,Y,%f,Z%f,Max,X,%f,Y,%f,Z,%f, Magnitude, %f",linearX,linearY,linearZ,maxX,maxY,maxZ, magnitude ));
-                    date1 = date2;
-                }
+
+                log.writeLog(TAG,String.format("X,%f,Y,%f,Z,%f,Max,X,%f,Y,%f,Z,%f, Magnitude, %f",linearX,linearY,linearZ,maxX,maxY,maxZ, magnitude ));
+
                 sensorMax.setText(String.format("maxX: %f | maxY: %f | maxZ: %f | magnitude: %f",maxX,maxY,maxZ, maxMagnitude));
                 isAccident(magnitude);
 
-                sensor.setText(String.valueOf(sensorName +": "));
                 for (int i = 0; i < filterValues.length; i++){
-                    if (sensorName.toUpperCase().equals("ACCELEROMETER")){
-                    }
                     sensor.append(
                             String.valueOf(f.format(event.values[i] - gravity[i]) + " ")
                     );
                 }
             }else{
-                //Non-accelerometer values; unfiltered
-                sensor.setText(String.valueOf(sensorName +": "));
+                //Non-accelerometer values; unfiltered - set sensor name and append value
                 for (int i = 0; i < event.values.length; i++){
                     sensor.append(String.valueOf(event.values[i]) + " ");
                 }

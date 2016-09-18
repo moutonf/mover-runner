@@ -42,6 +42,7 @@ public class RunnerMan extends FragmentActivity implements SensorDisplayFragment
 
         protected static final String TAG = "MOVER_LOCATION_SERVICE";
         private Locale deviceLocale;
+    LoggingService log;
 
         /*LOCATION*/
         private GoogleMap mMap;
@@ -91,6 +92,7 @@ public class RunnerMan extends FragmentActivity implements SensorDisplayFragment
             this.findViewById(android.R.id.content).setKeepScreenOn(true);
 
             ButterKnife.bind(this);
+            log = new LoggingService(this, "LOCATION");
 
             deviceLocale = Locale.getDefault();
 
@@ -144,6 +146,9 @@ public class RunnerMan extends FragmentActivity implements SensorDisplayFragment
         mPreviousLocation = mCurrentLocation;
         mCurrentLocation = location;
         mLastUpdateTime = DateFormat.getTimeInstance().format(new Date());
+
+        log.writeLog(TAG,String.format("lat,%f,long,%f,alt,%f",location.getLatitude(),location.getLongitude(),location.getAltitude()));
+
         updateUI();
         if (mapReady){
             updateMapLocation();
