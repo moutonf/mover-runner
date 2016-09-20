@@ -1,4 +1,4 @@
-package com.csir.myapplication;
+package com.csir.runner;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;

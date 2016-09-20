@@ -1,4 +1,4 @@
-package com.csir.myapplication;
+package com.csir.runner;
 
 import org.junit.Test;
 

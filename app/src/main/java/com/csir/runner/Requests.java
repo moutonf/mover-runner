@@ -1,21 +1,13 @@
-package com.csir.myapplication;
+package com.csir.runner;
 
-import android.location.Location;
-import android.net.Uri;
 import android.os.StrictMode;
-import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
-import android.widget.Button;
-import android.widget.TextView;
 
 /*OkHTTP classes*/
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.net.URL;
 import java.util.Date;
 
 import okhttp3.FormBody;
@@ -23,10 +15,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.MediaType;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
 import okhttp3.RequestBody;
-import okhttp3.Response;
 
 public class Requests {
 
