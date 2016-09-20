@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /*Ref: https://developer.android.com/training/basics/data-storage/files.html*/
@@ -30,7 +31,10 @@ public class LoggingService {
     /*Filename is date and time when activity is run*/
     public LoggingService(Context context, String TAG){
         this.context = context;
-        this.filename = String.valueOf(new Date().getTime());
+
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd-hh-mm-ss");
+        // parse the string into Date objec
+        this.filename = df.format(new Date());
         this.TAG = TAG;
         this.filename = filename + "-" + TAG + ".csv";
         if (isExternalStorageWritable()){
