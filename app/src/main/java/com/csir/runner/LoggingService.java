@@ -63,7 +63,7 @@ public class LoggingService {
     public void writeLog(String TAG, String input){
         date2 = new Date();
 
-        if ((date2.getTime() - date1.getTime()) > 5000 ){
+        if ((date2.getTime() - date1.getTime()) > 1000 ){
             //comma-separate values, easier for analysis
             //if the logger was not correctly created, this will throw exceptions repeatedly
             String [] input_values = input.split(",");
