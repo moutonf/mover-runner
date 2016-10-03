@@ -325,13 +325,15 @@ public class SensorDisplayFragment extends Fragment implements SensorEventListen
     /*Received at the same time as the activity*/
     public void onResume() {
         super.onResume();
+        Log.d(TAG,"Fragment onPause");
         for (Sensor s: deviceSensors){
             mSensorManager.registerListener(this, s, SensorManager.SENSOR_DELAY_NORMAL);
         }
 
     }
     public void onPause() {
+        Log.d(TAG,"Fragment onPause");
         super.onPause();
-        mSensorManager.unregisterListener(this);
+//        mSensorManager.unregisterListener(this);
     }
 }

@@ -271,13 +271,15 @@ public class RunnerMan extends FragmentActivity implements SensorDisplayFragment
     }
     @Override
     protected void onPause() {
+        Log.i(TAG,"RunnerMan onPause");
         super.onPause();
             /*Will drain battery unnecessarily*/
-        stopLocationUpdates();
+//        stopLocationUpdates();
     }
 
     @Override
     public void onResume() {
+        Log.i(TAG,"RunnerMan onPause");
         super.onResume();
         if (mGoogleApiClient.isConnected() && !mRequestingLocationUpdates) {
             startLocationUpdates();
