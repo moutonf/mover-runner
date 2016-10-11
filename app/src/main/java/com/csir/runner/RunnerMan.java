@@ -257,13 +257,22 @@ public class RunnerMan extends FragmentActivity implements SensorDisplayFragment
     @Override
     protected void onStart() {
         super.onStart();
-            /*Location updates are stopped when paused*/
+        Log.i(TAG,"RunnerMan onStart");
+        /*Location updates are stopped when activity is stopped*/
         mGoogleApiClient.connect();
+    }
+
+    @Override
+    protected void onDestroy(){
+        Log.i(TAG,"RunnerMan onDestroy");
+        log.closeLogFile();
+        super.onDestroy();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
+        Log.i(TAG,"RunnerMan onStop");
             /*Don't sustain connections*/
         if (mGoogleApiClient.isConnected()) {
             mGoogleApiClient.disconnect();
@@ -274,18 +283,15 @@ public class RunnerMan extends FragmentActivity implements SensorDisplayFragment
         Log.i(TAG,"RunnerMan onPause");
         super.onPause();
             /*Will drain battery unnecessarily*/
-//        stopLocationUpdates();
     }
-
     @Override
     public void onResume() {
-        Log.i(TAG,"RunnerMan onPause");
+        Log.i(TAG,"RunnerMan onResume");
         super.onResume();
         if (mGoogleApiClient.isConnected() && !mRequestingLocationUpdates) {
             startLocationUpdates();
         }
     }
-
     protected void stopLocationUpdates() {
         LocationServices.FusedLocationApi.removeLocationUpdates(
                 mGoogleApiClient, this);
@@ -294,23 +300,11 @@ public class RunnerMan extends FragmentActivity implements SensorDisplayFragment
     public void stop(View view)
     {
         finish();
-    }
 
+    }
     @Override
     public void onBackPressed() {
         super.onBackPressed();
         finish();
     }
-
-//    @Override
-//    public boolean stopActivity(int keyCode, KeyEvent event)
-//    {            finish();
-//
-//        if ((keyCode == KeyEvent.KEYCODE_BACK))
-//        {
-//        }
-//        return super.onKeyDown(keyCode, event);
-//    }
-
-
 }

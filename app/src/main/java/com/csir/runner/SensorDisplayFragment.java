@@ -308,7 +308,6 @@ public class SensorDisplayFragment extends Fragment implements SensorEventListen
                 Toast.LENGTH_LONG).show();
 
     }
-
     private boolean isAccident(double magnitude){
         Location currentLocation;
         /*need to determine a proper detection algorithm*/
@@ -323,17 +322,25 @@ public class SensorDisplayFragment extends Fragment implements SensorEventListen
         return false;
     }
     /*Received at the same time as the activity*/
+    @Override
     public void onResume() {
         super.onResume();
-        Log.d(TAG,"Fragment onPause");
+        Log.d(TAG,"Fragment onResume");
         for (Sensor s: deviceSensors){
             mSensorManager.registerListener(this, s, SensorManager.SENSOR_DELAY_NORMAL);
         }
 
     }
+    @Override
     public void onPause() {
         Log.d(TAG,"Fragment onPause");
         super.onPause();
-//        mSensorManager.unregisterListener(this);
+    }
+    @Override
+    public void onDestroyView(){
+        log.closeLogFile();
+        Log.d(TAG,"Fragment onDestroyView");
+        mSensorManager.unregisterListener(this);
+        super.onDestroyView();
     }
 }

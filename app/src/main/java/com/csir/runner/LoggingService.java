@@ -24,7 +24,6 @@ public class LoggingService {
     String TAG;
     Date date1,date2;
 
-
     FileWriter fw;
     BufferedWriter bw;
     /*Filename is date and time when activity is run*/
@@ -50,6 +49,8 @@ public class LoggingService {
             try {
                 logFile.createNewFile();
                 Log.i(LOG_TAG,"Log file successfully created");
+                fw = new FileWriter(logFile, true);
+                bw = new BufferedWriter(fw);
 
             }catch(IOException e){
                 Log.e(LOG_TAG,"Log file couldn't be created");
@@ -63,28 +64,46 @@ public class LoggingService {
     public void writeLog(String TAG, String input){
         date2 = new Date();
 
-        if ((date2.getTime() - date1.getTime()) > 1000 ){
-            //comma-separate values, easier for analysis
-            //if the logger was not correctly created, this will throw exceptions repeatedly
-            String [] input_values = input.split(",");
-            StringBuilder builder = new StringBuilder();
-            for (String value: input_values){
-                builder.append(value + ",");
+        if (logFile!=null){
+
+            if ((date2.getTime() - date1.getTime()) > 1000 ){
+                //comma-separate values, easier for analysis
+                //if the logger was not correctly created, this will throw exceptions repeatedly
+                String [] input_values = input.split(",");
+                StringBuilder builder = new StringBuilder();
+                for (String value: input_values){
+                    builder.append(value + ",");
+                }
+                String output = String.format("%s, %s, %s\n",new Date().toString(), TAG, builder.toString());
+
+                try {
+                    if (bw!=null){
+                        bw.write(output);
+                    }
+                } catch (Exception e) {
+                    Log.e(TAG,"Log output could not write");
+                    Log.e(TAG,Log.getStackTraceString(e));
+                }
+                date1 = date2;
             }
-            String output = String.format("%s, %s, %s\n",new Date().toString(), TAG, builder.toString());
-            try {
-                fw = new FileWriter(logFile, true);
-                bw = new BufferedWriter(fw);
-                bw.write(output);
-                bw.close();
-            } catch (Exception e) {
-                Log.e(TAG,"Log output could not write");
-                Log.e(TAG,Log.getStackTraceString(e));
-            }
-            date1 = date2;
+
         }
 
+    }
 
+    public void closeLogFile(){
+        Log.e(LOG_TAG,"Closing the logFile");
+        Log.e(TAG,"Closing the logFile");
+        try{
+            if(bw!=null){
+                bw.close();
+            }
+        }catch(IOException e){
+            Log.e(TAG,"Log file could not be closed successfully");
+        }finally{
+            bw = null;
+            fw = null;
+        }
     }
     /* Checks if external storage is available for read and write - External storage is used unless unavailable */
     private boolean isExternalStorageWritable() {
