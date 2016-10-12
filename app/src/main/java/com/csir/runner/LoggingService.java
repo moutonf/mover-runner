@@ -65,8 +65,8 @@ public class LoggingService {
         date2 = new Date();
 
         if (logFile!=null){
-
-            if ((date2.getTime() - date1.getTime()) > 1000 ){
+            /*One second was sufficient for regular trials but drops and such require less than half a second*/
+            if ((date2.getTime() - date1.getTime()) > 250 ){
                 //comma-separate values, easier for analysis
                 //if the logger was not correctly created, this will throw exceptions repeatedly
                 String [] input_values = input.split(",");
