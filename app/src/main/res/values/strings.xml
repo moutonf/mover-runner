@@ -43,7 +43,8 @@
     <!-- Strings related to login -->
     <string name="prompt_email">Email</string>
     <string name="prompt_password">Password</string>
-    <string name="prompt_password_confirm">Password Confirm (registration only)</string>
+    <string name="password_confirm_label">Password Confirm (Registration Only)</string>
+    <string name="prompt_password_confirm">Password Confirm</string>
     <string name="bypass">Bypass</string>
 
     <string name="action_sign_in">Sign in or register</string>
