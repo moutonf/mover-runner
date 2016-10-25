@@ -47,11 +47,6 @@ public class SensorDisplayFragment extends Fragment implements SensorEventListen
     private static final String TAG = "MOVER_SENSOR";
 
     private Sensor mAccelerometer;
-    private Sensor mGyro;
-    private Sensor mLight;
-    private Sensor mLinearAcceleration;
-    private Sensor mRotationVector;
-    private Sensor mSignificantMotion;
     HashMap<String, TextView> sensorTextViews;
     private List<Sensor> deviceSensors;
     private ViewGroup viewGroup;
@@ -91,13 +86,11 @@ public class SensorDisplayFragment extends Fragment implements SensorEventListen
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
     }
-    TextView sensorMax;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         view = inflater.inflate(R.layout.fragment_sensor_display, container, false);
-        sensorMax = (TextView)view.findViewById(R.id.accelerometer_max);
         mFlParent  = (LinearLayout) view.findViewById(R.id.fl_frag_sensor_display_parent);
         return view;
     }
@@ -137,19 +130,14 @@ public class SensorDisplayFragment extends Fragment implements SensorEventListen
         username = activity.getUsername();
         userID = activity.getUserID();
 
-
         allSensors =  mSensorManager.getSensorList(Sensor.TYPE_ALL);
+
         for (Sensor s: allSensors){
             Log.i(SENSOR_SERVICE_TAG,s.getName());
         }
         allSensors =  mSensorManager.getSensorList(Sensor.TYPE_ALL);
         /*UNCALIBRATED_GYROSCOPE and ROTATION_VECTOR > 4 event values*/
         mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        mGyro = mSensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
-        mLight = mSensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
-        mLinearAcceleration = mSensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
-        mRotationVector = mSensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
-        mSignificantMotion = mSensorManager.getDefaultSensor(Sensor.TYPE_SIGNIFICANT_MOTION);
 
         deviceSensors = new ArrayList<Sensor>();
         //A list of all potentially useful sensors
@@ -157,26 +145,6 @@ public class SensorDisplayFragment extends Fragment implements SensorEventListen
             Log.i(TAG, "Acceleromter added");
             deviceSensors.add(mAccelerometer);
         }
-//        if (mGyro != null){
-//            Log.i(TAG, "Gyro sensor added");
-//            deviceSensors.add(mGyro);
-//        }
-//        if (mLight != null){
-//            Log.i(TAG, "Light sensor added");
-//            deviceSensors.add(mLight);
-//        }
-//        if (mLinearAcceleration != null){
-//            Log.i(TAG, "Linear Acceleration sensor added");
-//            deviceSensors.add(mLinearAcceleration);
-//        }
-//        if (mRotationVector != null){
-//            Log.i(TAG, "Roation Vector sensor added");
-//            deviceSensors.add(mRotationVector);
-//        }
-//        if (mSignificantMotion != null){
-//            Log.i(TAG, "Significant Motion sensor added");
-//            deviceSensors.add(mSignificantMotion);
-//        }
 
         lparams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT );
         /*Adding an individual TextView for each sensor*/
@@ -272,7 +240,6 @@ public class SensorDisplayFragment extends Fragment implements SensorEventListen
 
                 log.writeLog(TAG,String.format("X,%f,Y,%f,Z,%f,Max,X,%f,Y,%f,Z,%f, Magnitude, %f",linearX,linearY,linearZ,maxX,maxY,maxZ, magnitude ));
 
-                sensorMax.setText(String.format("maxX: %f | maxY: %f | maxZ: %f | magnitude: %f",maxX,maxY,maxZ, maxMagnitude));
                 isAccident(magnitude);
 
                 for (int i = 0; i < filterValues.length; i++){

@@ -18,6 +18,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -38,19 +39,19 @@ import butterknife.ButterKnife;
 public class RunnerMan extends FragmentActivity implements SensorDisplayFragment.OnSensorFragmentInteractionListener, OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener, LocationListener {
 
-        protected static final String TAG = "MOVER_LOCATION_SERVICE";
-        private Locale deviceLocale;
+    protected static final String TAG = "MOVER_LOCATION_SERVICE";
+    private Locale deviceLocale;
     LoggingService log;
 
-        /*LOCATION*/
-        private GoogleMap mMap;
-        private boolean mapReady;
-        protected GoogleApiClient mGoogleApiClient;
-        protected Location mCurrentLocation;
-        private Location mPreviousLocation;
-        Boolean mRequestingLocationUpdates;
-        private LocationRequest mLocationRequest;
-        final private int LOCATION_INTERVAL = 10000; //10 seconds
+    /*LOCATION*/
+    private GoogleMap mMap;
+    private boolean mapReady;
+    protected GoogleApiClient mGoogleApiClient;
+    protected Location mCurrentLocation;
+    private Location mPreviousLocation;
+    Boolean mRequestingLocationUpdates;
+    private LocationRequest mLocationRequest;
+    final private int LOCATION_INTERVAL = 2000; //2 seconds
 
     float transparency = 0.5f;
     LatLng location;
@@ -101,17 +102,16 @@ public class RunnerMan extends FragmentActivity implements SensorDisplayFragment
             buildGoogleApiClient();
 
         }
-    private boolean mapSetup = false;
-
 
 
     public String getUsername(){
         return username;
     }
-
     public String getUserID(){
         return userID;
     }
+    boolean start, firstUpdate;
+    double distance, speed;
 
     public void onSensorFragmentInteraction(Uri uri){
         /*sensor shouldn't require any input from location, unless coordinates*/
@@ -124,17 +124,16 @@ public class RunnerMan extends FragmentActivity implements SensorDisplayFragment
     /*SET UP INTERVAL LOCATION UPDATES*/
     protected void createLocationRequest() {
         mLocationRequest = new LocationRequest();
-        mLocationRequest.setInterval(LOCATION_INTERVAL); //10 seconds
-        mLocationRequest.setFastestInterval(5000);
+        mLocationRequest.setInterval(LOCATION_INTERVAL); //2 seconds
+//        mLocationRequest.setFastestInterval(5000);
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
     }
 
     /*A rough estimate of speed*/
     public double calculateSpeed(Double distance){
-
         return ((60000 / LOCATION_INTERVAL) * distance) * 60; //distance travelled in 1 minute * 60 = distance/hr
     }
-    boolean start;
+
     @Override
     public void onLocationChanged(Location location) {
         /*Need the previous location for distance and route calculations*/
@@ -152,7 +151,6 @@ public class RunnerMan extends FragmentActivity implements SensorDisplayFragment
             updateMapLocation();
         }
     }
-    double distance, speed;
     /*Update the display headers*/
     private void updateUI() {
         distance = mPreviousLocation!=null?mCurrentLocation.distanceTo(mPreviousLocation):0.0;
@@ -174,17 +172,27 @@ public class RunnerMan extends FragmentActivity implements SensorDisplayFragment
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         mMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
-        if ( ContextCompat.checkSelfPermission( this, android.Manifest.permission.ACCESS_COARSE_LOCATION ) == PackageManager.PERMISSION_GRANTED ) {
+        if ( ContextCompat.checkSelfPermission( this, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ) {
             mMap.setMyLocationEnabled(true);
+            mapReady = true;
+            firstUpdate = true;
         }
-        mapReady = true;
-
     }
     /*The main map display and update method*/
 
 
     public void updateMapLocation(){
         location = new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude());
+        //maintain the zoom levels
+//        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location, mMap.getCameraPosition().zoom));
+
+//        CameraUpdate center=
+//                CameraUpdateFactory.newLatLng(location);
+//        CameraUpdate zoom = CameraUpdateFactory.zoomTo(zoom);
+//
+//        mMap.moveCamera(center);
+//        mMap.animateCamera(zoom);
+
         //only add a marker if start of the trip
         if (start){
                     mMap.addMarker(new MarkerOptions()
@@ -204,8 +212,15 @@ public class RunnerMan extends FragmentActivity implements SensorDisplayFragment
                     .width(3)
                     .color(Color.BLUE));
         }
-        //maintain the zoom levels
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location, mMap.getCameraPosition().zoom));
+
+        if (firstUpdate){
+            /*zoom to first location*/
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location, 15f));
+        }else{
+            /*maintain the zoom level*/
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location, mMap.getCameraPosition().zoom));
+        }
+
     }
 
     /*Boring Google Maps methods*/

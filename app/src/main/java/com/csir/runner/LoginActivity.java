@@ -259,7 +259,7 @@ public class LoginActivity extends AppCompatActivity {
                     intent.putExtra(getString(R.string.USER_ID_EXTRA), user_id);
                     intent.putExtra(getString(R.string.USERNAME_EXTRA), username);
                     startActivity(intent);
-                    Toast.makeText(context, R.string.login_successful + ", " + username, Toast.LENGTH_LONG).show();
+                    Toast.makeText(context, getString(R.string.login_successful,username), Toast.LENGTH_LONG).show();
                     finish();
                 }catch(JSONException e){
 

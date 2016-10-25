@@ -19,7 +19,7 @@
     <string name="update_time_label">Last updated</string>
     <string name="distance_label">Distance travel since last location</string>
     <string name="no_location_detected">No location detected</string>
-    <string name="login_successful">Login successful</string>
+    <string name="login_successful">Welcome back, %s</string>
 
     <string name="permission_denied">Permission has not been granted for this service</string>
     <!--SENSOR LABELS-->
