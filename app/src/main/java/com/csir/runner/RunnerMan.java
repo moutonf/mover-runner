@@ -220,7 +220,6 @@ public class RunnerMan extends FragmentActivity implements SensorDisplayFragment
             /*maintain the zoom level*/
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location, mMap.getCameraPosition().zoom));
         }
-
     }
 
     /*Boring Google Maps methods*/
