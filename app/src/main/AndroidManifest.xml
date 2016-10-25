@@ -5,6 +5,8 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
     <!--Hack Fix-->
     <uses-permission android:name="android.permission.WAKE_LOCK" />
 
@@ -18,7 +20,11 @@
         android:supportsRtl="true"
         android:name="com.csir.runner.InitRunner"
         android:theme="@style/AppTheme">
-        <activity android:name="com.csir.runner.MainActivity">
+
+        <!--ACTIVITIES-->
+        <activity android:name="com.csir.runner.MainActivity"
+            android:label="@string/activity_main"
+            >
         </activity>
         <activity
             android:name="com.csir.runner.RunnerMan"
@@ -30,6 +36,16 @@
                 android:value="com.csir.runner.MainActivity" />
             />
         </activity>
+        <activity
+            android:name="com.csir.runner.LoginActivity"
+            android:label="@string/activity_login">
+            <!--The launcher intent filter-->
+            <intent-filter android:label="@string/app_name">
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
              (See the file "res/values/google_maps_api.xml").
@@ -38,22 +54,15 @@
              sign the APK for publishing.
              You can define the keys for the debug and release targets in src/debug/ and src/release/. 
         -->
+
+        <!--META DATA-->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
-
-        <activity
-            android:name="com.csir.runner.LoginActivity"
-            android:label="@string/title_activity_login">
-            <!--The launcher intent filter-->
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="d38e2093e815353bd6126ba88b0a36e7a34693a2" />
+
     </application>
 
 </manifest>

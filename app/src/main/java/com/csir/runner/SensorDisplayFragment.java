@@ -99,18 +99,6 @@ public class SensorDisplayFragment extends Fragment implements SensorEventListen
         view = inflater.inflate(R.layout.fragment_sensor_display, container, false);
         sensorMax = (TextView)view.findViewById(R.id.accelerometer_max);
         mFlParent  = (LinearLayout) view.findViewById(R.id.fl_frag_sensor_display_parent);
-        Button mSendAccident = (Button) view.findViewById(R.id.send_accident);
-        mSendAccident.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                try{
-                    sendAccident(view);
-                }catch(Exception e){
-
-                }
-
-            }
-        });
         return view;
     }
     /*Enforces the interface*/
@@ -169,26 +157,26 @@ public class SensorDisplayFragment extends Fragment implements SensorEventListen
             Log.i(TAG, "Acceleromter added");
             deviceSensors.add(mAccelerometer);
         }
-        if (mGyro != null){
-            Log.i(TAG, "Gyro sensor added");
-            deviceSensors.add(mGyro);
-        }
-        if (mLight != null){
-            Log.i(TAG, "Light sensor added");
-            deviceSensors.add(mLight);
-        }
-        if (mLinearAcceleration != null){
-            Log.i(TAG, "Linear Acceleration sensor added");
-            deviceSensors.add(mLinearAcceleration);
-        }
-        if (mRotationVector != null){
-            Log.i(TAG, "Roation Vector sensor added");
-            deviceSensors.add(mRotationVector);
-        }
-        if (mSignificantMotion != null){
-            Log.i(TAG, "Significant Motion sensor added");
-            deviceSensors.add(mSignificantMotion);
-        }
+//        if (mGyro != null){
+//            Log.i(TAG, "Gyro sensor added");
+//            deviceSensors.add(mGyro);
+//        }
+//        if (mLight != null){
+//            Log.i(TAG, "Light sensor added");
+//            deviceSensors.add(mLight);
+//        }
+//        if (mLinearAcceleration != null){
+//            Log.i(TAG, "Linear Acceleration sensor added");
+//            deviceSensors.add(mLinearAcceleration);
+//        }
+//        if (mRotationVector != null){
+//            Log.i(TAG, "Roation Vector sensor added");
+//            deviceSensors.add(mRotationVector);
+//        }
+//        if (mSignificantMotion != null){
+//            Log.i(TAG, "Significant Motion sensor added");
+//            deviceSensors.add(mSignificantMotion);
+//        }
 
         lparams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT );
         /*Adding an individual TextView for each sensor*/
@@ -301,13 +289,14 @@ public class SensorDisplayFragment extends Fragment implements SensorEventListen
         }
     }
 
-    public void sendAccident(View view) throws IOException, JSONException
-    {Location currentLocation = activity.getLocation();
-        JSONObject response = requester.sendAccident("runner",currentLocation.getLatitude(),currentLocation.getLongitude(), new Date(), Integer.parseInt(userID));
-        Toast.makeText(activity, response.getString("result"),
-                Toast.LENGTH_LONG).show();
-
-    }
+//    public void sendAccident(View view) throws IOException, JSONException
+//    {
+//        Location currentLocation = activity.getLocation();
+//        JSONObject response = requester.sendAccident("runner",currentLocation.getLatitude(),currentLocation.getLongitude(), new Date(), Integer.parseInt(userID));
+//        Toast.makeText(activity, response.getString("result"),
+//                Toast.LENGTH_LONG).show();
+//
+//    }
     private boolean isAccident(double magnitude){
         Location currentLocation;
         /*need to determine a proper detection algorithm*/
@@ -316,7 +305,7 @@ public class SensorDisplayFragment extends Fragment implements SensorEventListen
             Toast.makeText(activity, "An accident occured?",
                     Toast.LENGTH_LONG).show();
             /*post the location*/
-//            String response = requester.sendAccident(currentLocation);
+//            JSONObject response = requester.sendAccident("runner",currentLocation.getLatitude(),currentLocation.getLongitude(), new Date(), Integer.parseInt(userID));
             return true;
         }
         return false;

@@ -36,8 +36,9 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
 
     <!--RUNNER-->
-    <string name="activity_runner">Runner Application</string>
-    <string name="title_activity_login">Mover - Login</string>
+    <string name="activity_runner">Runner - Active</string>
+    <string name="activity_login">Login</string>
+    <string name="activity_main">Runner</string>
 
     <!-- Strings related to login -->
     <string name="prompt_email">Email</string>

@@ -21,8 +21,9 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = getIntent();
         userId = intent.getStringExtra(getString(R.string.USER_ID_EXTRA));
         username = intent.getStringExtra(getString(R.string.USERNAME_EXTRA));
-        this.setTitle("User:" + userId);
+        this.setTitle(getString(R.string.activity_main));
     }
+
     public void getRunner(View view) {
         String[] perms = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.WRITE_EXTERNAL_STORAGE};
         if (EasyPermissions.hasPermissions(this, perms)) {

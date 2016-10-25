@@ -35,6 +35,7 @@ public class Requests {
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
     }
+
     private JSONObject call(Request request) throws IOException {
         JSONObject result;
         try{

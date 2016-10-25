@@ -32,8 +32,6 @@ public class LoginActivity extends AppCompatActivity {
     Intent intent;
     private Requests requester;
 
-
-
     /**
      * Keep track of the login task to ensure we can cancel it if requested.
      */
@@ -58,7 +56,6 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
         // Set up the login form.
         mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
-
         mPasswordView = (EditText) findViewById(R.id.password);
         mPasswordConfirmView = (EditText) findViewById(R.id.password_confirm);
 
@@ -257,10 +254,12 @@ public class LoginActivity extends AppCompatActivity {
 
                 intent = new Intent(context, MainActivity.class);
                 try{
-                    intent.putExtra(getString(R.string.USER_ID_EXTRA), result.getString("id"));
-                    intent.putExtra(getString(R.string.USERNAME_EXTRA), result.getString("username"));
+                    String username = result.getString("username");
+                    String user_id = result.getString("id");
+                    intent.putExtra(getString(R.string.USER_ID_EXTRA), user_id);
+                    intent.putExtra(getString(R.string.USERNAME_EXTRA), username);
                     startActivity(intent);
-                    Toast.makeText(context, R.string.login_successful, Toast.LENGTH_LONG).show();
+                    Toast.makeText(context, R.string.login_successful + ", " + username, Toast.LENGTH_LONG).show();
                     finish();
                 }catch(JSONException e){
 
