@@ -11,7 +11,6 @@
     <string name="location">Get location</string>
     <string name="map">Show map</string>
 
-
     <!--LOCATION SERVICE LABELS-->
     <string name="latitude_label">Latitude</string>
     <string name="longitude_label">Longitude</string>
@@ -30,10 +29,6 @@
     <string name="start">Start</string>
     <string name="stop">Stop</string>
     <string name="send_accident">Send Accident</string>
-
-
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
 
     <!--RUNNER-->
     <string name="activity_runner">Runner - Active</string>
@@ -56,9 +51,6 @@
     <string name="error_network">Network error</string>
     <string name="error_incorrect_password">This password is incorrect</string>
     <string name="error_field_required">This field is required</string>
-    <string name="permission_rationale">"Contacts permissions are needed for providing email
-        completions."
-    </string>
 
     <!--INTENT EXTRAS-->
     <string name="USER_ID_EXTRA">USER_ID</string>
