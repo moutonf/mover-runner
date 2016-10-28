@@ -36,6 +36,7 @@
             />
         </activity>
         <activity
+            android:theme="@style/splashScreenTheme"
             android:name="com.csir.runner.LoginActivity"
             android:label="@string/activity_login">
             <!--The launcher intent filter-->
