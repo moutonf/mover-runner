@@ -248,7 +248,7 @@ public class SensorDisplayFragment extends Fragment implements SensorEventListen
 
 
                 if(isAccident(magnitude)){
-                    postAccident();
+                    showAccidentScreen();
                 }
 
             }else{
@@ -259,34 +259,34 @@ public class SensorDisplayFragment extends Fragment implements SensorEventListen
             }
         }
     }
+public void sendAccident(){
+    Location currentLocation;
+    currentLocation = activity.getLocation();
+            try {
+            String stringResponse;
+            JSONObject response = requester.sendAccident("runner",currentLocation.getLatitude(),currentLocation.getLongitude(), new Date(), Integer.parseInt(userID));
+            if (response!=null){
+stringResponse = response.getString("result");
+            if (stringResponse.toLowerCase().equals("success")){
+                Toast.makeText(activity, "Accident has been sent and services are notified",
+                        Toast.LENGTH_LONG).show();
+            }else{
+                Toast.makeText(activity, "Accident could not be sent",
+                        Toast.LENGTH_LONG).show();
+            }
 
-    private void postAccident(){
-        Location currentLocation;
-        currentLocation = activity.getLocation();
-        Toast.makeText(activity, "An accident occured?",
+            }
+        }catch(IOException e){
+            Log.e(TAG, "Accident report could not be sent, internet may not be available.");
+        }catch(JSONException e){
+            Log.e(TAG, "JSON response object could not be accessed");
+        }
+}
+    private void showAccidentScreen(){
+
+        Toast.makeText(activity, "An accident occurred?",
                 Toast.LENGTH_LONG).show();
-            /*post the location*/
-               /*show the countdown timer for now*/
         activity.showCountDownTimer();
-//        try {
-//            String stringResponse;
-//            JSONObject response = requester.sendAccident("runner",currentLocation.getLatitude(),currentLocation.getLongitude(), new Date(), Integer.parseInt(userID));
-//            if (response!=null){
-//stringResponse = response.getString("result");
-//            if (stringResponse.toLowerCase().equals("success")){
-//                Toast.makeText(activity, "Accident has been sent and services are notified",
-//                        Toast.LENGTH_LONG).show();
-//            }else{
-//                Toast.makeText(activity, "Accident could not be sent",
-//                        Toast.LENGTH_LONG).show();
-//            }
-//
-//            }
-//        }catch(IOException e){
-//            Log.e(TAG, "Accident report could not be sent, internet may not be available.");
-//        }catch(JSONException e){
-//            Log.e(TAG, "JSON response object could not be accessed");
-//        }
     }
 
     private boolean isAccident(double magnitude){

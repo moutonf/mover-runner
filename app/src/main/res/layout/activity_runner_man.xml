@@ -34,9 +34,10 @@
             android:id="@+id/countdown_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
             android:textStyle="bold"
             android:textSize="32sp"
+            android:gravity="center"
+            android:layout_centerHorizontal="true"
             />
 
     </RelativeLayout>
@@ -58,7 +59,7 @@
 
     <TextView
         android:id="@+id/latitude_text"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         />
     <TextView

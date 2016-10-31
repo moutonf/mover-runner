@@ -7,6 +7,7 @@ import android.location.Location;
 import android.net.Uri;
 import android.os.CountDownTimer;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
 import android.os.Bundle;
 import android.util.Log;
@@ -96,7 +97,7 @@ public class RunnerMan extends FragmentActivity implements SensorDisplayFragment
 
             mapReady = false;
             mRequestingLocationUpdates = true;
-
+            fm = getSupportFragmentManager();
             this.findViewById(android.R.id.content).setKeepScreenOn(true);
 
             ButterKnife.bind(this);
@@ -271,6 +272,7 @@ public class RunnerMan extends FragmentActivity implements SensorDisplayFragment
 
         createLocationRequest();
     }
+    FragmentManager fm;
     private CountDownTimer timer;
     public void showCountDownTimer(){
         runnerDisplay.setVisibility(LinearLayout.GONE);
@@ -284,6 +286,10 @@ public class RunnerMan extends FragmentActivity implements SensorDisplayFragment
 
             public void onFinish() {
                 //activate the post
+//if you added fragment via layout xml
+                SensorDisplayFragment fragment = (SensorDisplayFragment) fm.findFragmentById(R.id.sensor_display_fragment);
+                fragment.sendAccident();
+                cancelAccident(null);
             }
 
         }.start();
