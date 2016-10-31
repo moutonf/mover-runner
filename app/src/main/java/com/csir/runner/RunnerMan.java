@@ -5,6 +5,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
 import android.net.Uri;
+import android.os.CountDownTimer;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
 import android.os.Bundle;
@@ -270,16 +271,29 @@ public class RunnerMan extends FragmentActivity implements SensorDisplayFragment
 
         createLocationRequest();
     }
-
+    private CountDownTimer timer;
     public void showCountDownTimer(){
         runnerDisplay.setVisibility(LinearLayout.GONE);
         countdownDisplay.setVisibility(LinearLayout.VISIBLE);
+
+        timer = new CountDownTimer(8000, 100) {
+
+            public void onTick(long millisUntilFinished) {
+                countdownText.setText( String.valueOf(millisUntilFinished / 1000.0));
+            }
+
+            public void onFinish() {
+                //activate the post
+            }
+
+        }.start();
     }
 
     public void cancelAccident(View view)
     {
         /*stop the timer and show the display screen again */
         countdownDisplay.setVisibility(LinearLayout.GONE);
+        timer.cancel();
         runnerDisplay.setVisibility(LinearLayout.VISIBLE);
     }
 
