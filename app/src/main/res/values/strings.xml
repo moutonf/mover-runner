@@ -10,7 +10,7 @@
     <string name="runner">Start Runner</string>
     <string name="location">Get location</string>
     <string name="map">Show map</string>
-
+    <string name="cancel_accident">I am not injured, cancel accident</string>
     <!--LOCATION SERVICE LABELS-->
     <string name="latitude_label">Latitude</string>
     <string name="longitude_label">Longitude</string>

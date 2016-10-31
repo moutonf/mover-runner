@@ -10,6 +10,9 @@ import android.support.v4.content.ContextCompat;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -66,12 +69,17 @@ public class RunnerMan extends FragmentActivity implements SensorDisplayFragment
     @BindView(R.id.longitude_text) TextView mLongitudeText;
     @BindView(R.id.speed_text) TextView mSpeedText;
     @BindView(R.id.last_update_time) TextView mLastUpdateTimeText;
+    @BindView(R.id.runner_display) LinearLayout runnerDisplay;
+    @BindView(R.id.countdown_display) RelativeLayout countdownDisplay;
+    @BindView(R.id.countdown_text) TextView countdownText;
 
     @BindString(R.string.latitude_label) String mLatitudeLabel;
     @BindString(R.string.longitude_label) String mLongitudeLabel;
     @BindString(R.string.update_time_label) String mUpdateTimeLabel;
     @BindString(R.string.speed_label) String mSpeedLabel;
     @BindString(R.string.distance_label) String mDistanceLabel;
+
+    @BindView(R.id.cancel_accident) Button cancelAccident;
 
      /*DISPLAY VARIABLES*/
     protected String mLastUpdateTime;
@@ -92,6 +100,11 @@ public class RunnerMan extends FragmentActivity implements SensorDisplayFragment
 
             ButterKnife.bind(this);
             log = new LoggingService(this, "LOCATION");
+
+            countdownDisplay.setBackgroundColor(Color.rgb(255, 117, 151));
+            countdownDisplay.setVisibility(RelativeLayout.GONE);
+            cancelAccident.setBackgroundColor(Color.LTGRAY);
+            countdownText.setTextColor(Color.WHITE);
 
             deviceLocale = Locale.getDefault();
 
@@ -183,16 +196,6 @@ public class RunnerMan extends FragmentActivity implements SensorDisplayFragment
 
     public void updateMapLocation(){
         location = new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude());
-        //maintain the zoom levels
-//        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location, mMap.getCameraPosition().zoom));
-
-//        CameraUpdate center=
-//                CameraUpdateFactory.newLatLng(location);
-//        CameraUpdate zoom = CameraUpdateFactory.zoomTo(zoom);
-//
-//        mMap.moveCamera(center);
-//        mMap.animateCamera(zoom);
-
         //only add a marker if start of the trip
         if (start){
                     mMap.addMarker(new MarkerOptions()
@@ -266,6 +269,18 @@ public class RunnerMan extends FragmentActivity implements SensorDisplayFragment
                 .build();
 
         createLocationRequest();
+    }
+
+    public void showCountDownTimer(){
+        runnerDisplay.setVisibility(LinearLayout.GONE);
+        countdownDisplay.setVisibility(LinearLayout.VISIBLE);
+    }
+
+    public void cancelAccident(View view)
+    {
+        /*stop the timer and show the display screen again */
+        countdownDisplay.setVisibility(LinearLayout.GONE);
+        runnerDisplay.setVisibility(LinearLayout.VISIBLE);
     }
 
     @Override

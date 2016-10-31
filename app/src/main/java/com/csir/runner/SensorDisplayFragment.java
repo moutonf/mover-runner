@@ -240,13 +240,17 @@ public class SensorDisplayFragment extends Fragment implements SensorEventListen
 
                 log.writeLog(TAG,String.format("X,%f,Y,%f,Z,%f,Max,X,%f,Y,%f,Z,%f, Magnitude, %f",linearX,linearY,linearZ,maxX,maxY,maxZ, magnitude ));
 
-                isAccident(magnitude);
-
                 for (int i = 0; i < filterValues.length; i++){
                     sensor.append(
                             String.valueOf(f.format(event.values[i] - gravity[i]) + " ")
                     );
                 }
+
+
+                if(isAccident(magnitude)){
+                    postAccident();
+                }
+
             }else{
                 //Non-accelerometer values; unfiltered - set sensor name and append value
                 for (int i = 0; i < event.values.length; i++){
@@ -256,25 +260,39 @@ public class SensorDisplayFragment extends Fragment implements SensorEventListen
         }
     }
 
-//    public void sendAccident(View view) throws IOException, JSONException
-//    {
-//        Location currentLocation = activity.getLocation();
-//        JSONObject response = requester.sendAccident("runner",currentLocation.getLatitude(),currentLocation.getLongitude(), new Date(), Integer.parseInt(userID));
-//        Toast.makeText(activity, response.getString("result"),
-//                Toast.LENGTH_LONG).show();
-//
-//    }
-    private boolean isAccident(double magnitude){
+    private void postAccident(){
         Location currentLocation;
-        /*need to determine a proper detection algorithm*/
-        if (magnitude > 50){
-            currentLocation = activity.getLocation();
-            Toast.makeText(activity, "An accident occured?",
-                    Toast.LENGTH_LONG).show();
+        currentLocation = activity.getLocation();
+        Toast.makeText(activity, "An accident occured?",
+                Toast.LENGTH_LONG).show();
             /*post the location*/
+               /*show the countdown timer for now*/
+        activity.showCountDownTimer();
+//        try {
+//            String stringResponse;
 //            JSONObject response = requester.sendAccident("runner",currentLocation.getLatitude(),currentLocation.getLongitude(), new Date(), Integer.parseInt(userID));
-            return true;
-        }
+//            if (response!=null){
+//stringResponse = response.getString("result");
+//            if (stringResponse.toLowerCase().equals("success")){
+//                Toast.makeText(activity, "Accident has been sent and services are notified",
+//                        Toast.LENGTH_LONG).show();
+//            }else{
+//                Toast.makeText(activity, "Accident could not be sent",
+//                        Toast.LENGTH_LONG).show();
+//            }
+//
+//            }
+//        }catch(IOException e){
+//            Log.e(TAG, "Accident report could not be sent, internet may not be available.");
+//        }catch(JSONException e){
+//            Log.e(TAG, "JSON response object could not be accessed");
+//        }
+    }
+
+    private boolean isAccident(double magnitude){
+        /*need to determine a proper detection algorithm*/
+        if (magnitude >= 13) return true;
+
         return false;
     }
     /*Received at the same time as the activity*/
