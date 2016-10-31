@@ -2,6 +2,7 @@ package com.csir.runner;
 
 import android.content.Context;
 import android.os.Environment;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import java.io.BufferedWriter;
@@ -27,12 +28,16 @@ public class LoggingService {
     FileWriter fw;
     BufferedWriter bw;
     /*Filename is date and time when activity is run*/
-    public LoggingService(Context context, String TAG){
+    public LoggingService(Context context, String TAG, String special_filename){
         this.context = context;
 
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd-hh-mm-ss");
         // parse the string into Date objec
-        this.filename = df.format(new Date());
+        if (special_filename!=null){
+            this.filename = special_filename + "-" + df.format(new Date());
+        }else{
+            this.filename = df.format(new Date());
+        }
         this.TAG = TAG;
         this.filename = filename + "-" + TAG + ".csv";
         if (isExternalStorageWritable()){
@@ -59,6 +64,15 @@ public class LoggingService {
         }
         Log.i(LOG_TAG,"Log file location: " + logFile.getAbsolutePath());
         date1 = new Date();
+    }
+
+    public String getFilename(){
+        if (this.filename != null){
+            return this.filename;
+        }else{
+            return "";
+        }
+
     }
 
     public void writeLog(String TAG, String input){
@@ -92,8 +106,8 @@ public class LoggingService {
     }
 
     public void closeLogFile(){
-        Log.e(LOG_TAG,"Closing the logFile");
-        Log.e(TAG,"Closing the logFile");
+        Log.e(LOG_TAG,"Closing " + getFilename());
+        Log.e(TAG,"Closing the " + getFilename());
         try{
             if(bw!=null){
                 bw.close();

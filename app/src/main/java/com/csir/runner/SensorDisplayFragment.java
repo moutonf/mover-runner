@@ -42,8 +42,10 @@ public class SensorDisplayFragment extends Fragment implements SensorEventListen
     private OnSensorFragmentInteractionListener mListener;
 
     LoggingService log;
+    LoggingService accidentLog;
+
     private SensorManager mSensorManager;
-    private static final String SENSOR_SERVICE_TAG = "SENSOR SERVICE";
+    private static final String SENSOR_SERVICE_TAG = "MOV_SENSOR_SERVICE";
     private static final String TAG = "MOVER_SENSOR";
 
     private Sensor mAccelerometer;
@@ -126,7 +128,9 @@ public class SensorDisplayFragment extends Fragment implements SensorEventListen
         super.onActivityCreated(savedInstanceState);
         mSensorManager = (SensorManager) getActivity().getSystemService(Context.SENSOR_SERVICE);
         activity = (RunnerMan)getActivity();
-        log = new LoggingService(view.getContext(), "SENSORS");
+        log = new LoggingService(view.getContext(), "SENSORS",null);
+//        accidentLog = new LoggingService(view.getContext(), "SENSORS","incidents");
+
         username = activity.getUsername();
         userID = activity.getUserID();
 
@@ -185,7 +189,7 @@ public class SensorDisplayFragment extends Fragment implements SensorEventListen
         sensorName = event.sensor.getName();
         sensor = (TextView)sensorTextViews.get(sensorName);
         sensor.setText(String.valueOf(sensorName +": "));
-
+        String output;
         if (sensor != null){
 
             /*Accelerometer is the most important sensor as it is low-passed and magnitude is calculated*/
@@ -237,8 +241,14 @@ public class SensorDisplayFragment extends Fragment implements SensorEventListen
                     }
                 }
                 /*only write values to log every 20 seconds to minimize size and IO*/
+                output = String.format("X,%f,Y,%f,Z,%f,Max,X,%f,Y,%f,Z,%f, Magnitude, %f",linearX,linearY,linearZ,maxX,maxY,maxZ, magnitude);
+                log.writeLog(TAG, output);
 
-                log.writeLog(TAG,String.format("X,%f,Y,%f,Z,%f,Max,X,%f,Y,%f,Z,%f, Magnitude, %f",linearX,linearY,linearZ,maxX,maxY,maxZ, magnitude ));
+                if(isAccident(magnitude)){
+//                    showAccidentScreen();
+                    Toast.makeText(activity, "An accident may have occurred.", Toast.LENGTH_SHORT).show();
+//                    accidentLog.writeLog(TAG, output);
+                }
 
                 for (int i = 0; i < filterValues.length; i++){
                     sensor.append(
@@ -247,9 +257,7 @@ public class SensorDisplayFragment extends Fragment implements SensorEventListen
                 }
 
 
-                if(isAccident(magnitude)){
-                    showAccidentScreen();
-                }
+
 
             }else{
                 //Non-accelerometer values; unfiltered - set sensor name and append value
@@ -284,14 +292,12 @@ stringResponse = response.getString("result");
 }
     private void showAccidentScreen(){
 
-        Toast.makeText(activity, "An accident occurred?",
-                Toast.LENGTH_LONG).show();
         activity.showCountDownTimer();
     }
-
+    public final int THRESHOLD = 15;
     private boolean isAccident(double magnitude){
         /*need to determine a proper detection algorithm*/
-        if (magnitude >= 13) return true;
+        if (magnitude >= THRESHOLD) return true;
 
         return false;
     }

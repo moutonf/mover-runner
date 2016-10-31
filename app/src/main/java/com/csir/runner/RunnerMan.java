@@ -101,7 +101,7 @@ public class RunnerMan extends FragmentActivity implements SensorDisplayFragment
             this.findViewById(android.R.id.content).setKeepScreenOn(true);
 
             ButterKnife.bind(this);
-            log = new LoggingService(this, "LOCATION");
+            log = new LoggingService(this, "LOCATION", null);
 
             countdownDisplay.setBackgroundColor(Color.rgb(255, 117, 151));
             countdownDisplay.setVisibility(RelativeLayout.GONE);
