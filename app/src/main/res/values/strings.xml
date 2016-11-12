@@ -19,6 +19,8 @@
     <string name="distance_label">Distance travel since last location</string>
     <string name="no_location_detected">No location detected</string>
     <string name="login_successful">Welcome back, %s</string>
+    <string name="incorrect_login">Password or username is incorrect</string>
+    <string name="no_internet">An internet connection is not available. Please check settings.</string>
 
     <string name="permission_denied">Permission has not been granted for this service</string>
     <!--SENSOR LABELS-->

@@ -2,6 +2,8 @@ package com.csir.runner;
 
 import android.app.Application;
 import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.PowerManager;
 
@@ -32,6 +34,17 @@ public class InitRunner extends Application {
         this.mWakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "Application wakelock");
         /*wakelock will be released when the process is killed, very bad coding practice. hack fix*/
         this.mWakeLock.acquire();
+    }
+
+    public boolean internetAvailable(){
+
+        ConnectivityManager cm =
+                (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        boolean isConnected = activeNetwork != null &&
+                activeNetwork.isConnected();
+        return isConnected;
     }
 
 }

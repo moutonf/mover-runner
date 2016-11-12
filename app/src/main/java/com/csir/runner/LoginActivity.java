@@ -134,7 +134,9 @@ public class LoginActivity extends AppCompatActivity {
         } else {
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
-            showProgress(true);
+            if (InitRunner.getInstance().internetAvailable()) {
+
+                showProgress(true);
             if (auth.equals(LOGIN_URL)){
                 Log.i(TAG, "Login");
                 mAuthTask = new UserAuthTask(email, password, null,LOGIN_URL);
@@ -144,6 +146,10 @@ public class LoginActivity extends AppCompatActivity {
                 Log.i(TAG, "Register");
                 mAuthTask = new UserAuthTask(email, password, passwordConfirm, REGISTER_URL);
                 mAuthTask.execute((Void) null);
+            }
+
+            }else{
+                Toast.makeText(this, getString(R.string.no_internet), Toast.LENGTH_LONG).show();
             }
         }
     }
@@ -267,7 +273,7 @@ public class LoginActivity extends AppCompatActivity {
                 }
 
             } else {
-                mPasswordView.setError(getString(R.string.error_incorrect_password));
+                Toast.makeText(context, getString(R.string.incorrect_login), Toast.LENGTH_LONG).show();
                 mPasswordView.requestFocus();
             }
         }
