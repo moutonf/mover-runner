@@ -270,18 +270,19 @@ public class SensorDisplayFragment extends Fragment implements SensorEventListen
 public void sendAccident(){
     Location currentLocation;
     currentLocation = activity.getLocation();
-            try {
+    if(InitRunner.getInstance().internetAvailable()){
+        try {
             String stringResponse;
             JSONObject response = requester.sendAccident("runner",currentLocation.getLatitude(),currentLocation.getLongitude(), new Date(), Integer.parseInt(userID));
             if (response!=null){
-stringResponse = response.getString("result");
-            if (stringResponse.toLowerCase().equals("success")){
-                Toast.makeText(activity, "Accident has been sent and services are notified",
-                        Toast.LENGTH_LONG).show();
-            }else{
-                Toast.makeText(activity, "Accident could not be sent",
-                        Toast.LENGTH_LONG).show();
-            }
+                stringResponse = response.getString("result");
+                if (stringResponse.toLowerCase().equals("success")){
+                    Toast.makeText(activity, "Accident has been sent and services are notified",
+                            Toast.LENGTH_LONG).show();
+                }else{
+                    Toast.makeText(activity, "Accident could not be sent",
+                            Toast.LENGTH_LONG).show();
+                }
 
             }
         }catch(IOException e){
@@ -289,6 +290,10 @@ stringResponse = response.getString("result");
         }catch(JSONException e){
             Log.e(TAG, "JSON response object could not be accessed");
         }
+
+    }else{
+        Toast.makeText(activity, getString(R.string.no_internet), Toast.LENGTH_SHORT).show();
+    }
 }
     private void showAccidentScreen(){
 
