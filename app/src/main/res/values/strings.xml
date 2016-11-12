@@ -1,5 +1,4 @@
 <resources>
-    <string name="app_name">Mover Runner</string>
     <!--REQUEST LABELS-->
     <string name="get">GET</string>
     <string name="post">POST</string>
