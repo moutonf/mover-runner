@@ -245,7 +245,7 @@ public class SensorDisplayFragment extends Fragment implements SensorEventListen
                 log.writeLog(TAG, output);
 
                 if(isAccident(magnitude)){
-//                    showAccidentScreen();
+                    showAccidentScreen();
                     Toast.makeText(activity, "An accident may have occurred.", Toast.LENGTH_SHORT).show();
 //                    accidentLog.writeLog(TAG, output);
                 }
