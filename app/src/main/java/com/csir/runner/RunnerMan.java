@@ -96,8 +96,6 @@ public class RunnerMan extends FragmentActivity implements SensorDisplayFragment
 
             Intent intent = getIntent();
             userID = intent.getStringExtra(getString(R.string.USER_ID_EXTRA));
-            username = intent.getStringExtra(getString(R.string.USERNAME_EXTRA));
-
             mapReady = false;
             mRequestingLocationUpdates = true;
             fm = getSupportFragmentManager();
