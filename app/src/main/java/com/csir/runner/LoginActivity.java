@@ -32,10 +32,6 @@ public class LoginActivity extends AppCompatActivity {
     Intent intent;
     private Requests requester;
 
-    /**
-     * Keep track of the login task to ensure we can cancel it if requested.
-     */
-
     // UI references.
     private AutoCompleteTextView mEmailView;
     private EditText mPasswordView;
@@ -155,13 +151,10 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private boolean isEmailValid(String email) {
-        //TODO: Replace this with your own logic
         return email.contains("@");
     }
 
     private boolean isPasswordValid(String password) {
-        //TODO: Replace this with your own logic
-//        return password.length() > 4;
         return true;
     }
     /**

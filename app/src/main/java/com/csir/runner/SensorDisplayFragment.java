@@ -36,13 +36,10 @@ import java.util.List;
  * create an instance of this fragment.
  */
 public class SensorDisplayFragment extends Fragment implements SensorEventListener {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
 
     private OnSensorFragmentInteractionListener mListener;
 
     LoggingService log;
-    LoggingService accidentLog;
 
     private SensorManager mSensorManager;
     private static final String SENSOR_SERVICE_TAG = "MOV_SENSOR_SERVICE";
@@ -59,6 +56,9 @@ public class SensorDisplayFragment extends Fragment implements SensorEventListen
     static final float LOW_PASS_ALPHA = 0.25f; // if ALPHA = 1 OR 0, no filter applies.
     final float GRAVITY_ALPHA = 0.8f;
 
+    private double magnitude;
+    public final int THRESHOLD = 15;
+
     Float maxX,maxY,maxZ;
     View view;
     RunnerMan activity;
@@ -69,7 +69,6 @@ public class SensorDisplayFragment extends Fragment implements SensorEventListen
     float[] gravity;
     Double maxMagnitude;
 
-    private String username;
     private String userID;
 
     List<Sensor> allSensors;
@@ -79,7 +78,6 @@ public class SensorDisplayFragment extends Fragment implements SensorEventListen
         // Required empty public constructor
     }
 
-    // TODO: Rename and change types and number of parameters
     public static SensorDisplayFragment newInstance() {
         return new SensorDisplayFragment();
     }
@@ -96,6 +94,7 @@ public class SensorDisplayFragment extends Fragment implements SensorEventListen
         mFlParent  = (LinearLayout) view.findViewById(R.id.fl_frag_sensor_display_parent);
         return view;
     }
+
     /*Enforces the interface*/
     @Override
     public void onAttach(Context context) {
@@ -115,9 +114,9 @@ public class SensorDisplayFragment extends Fragment implements SensorEventListen
     }
 
     public interface OnSensorFragmentInteractionListener {
-        // TODO: Update argument type and name
         void onSensorFragmentInteraction(Uri uri);
     }
+
     /*Interface method*/
     @Override
     public final void onAccuracyChanged(Sensor sensor, int accuracy) {
@@ -129,17 +128,15 @@ public class SensorDisplayFragment extends Fragment implements SensorEventListen
         mSensorManager = (SensorManager) getActivity().getSystemService(Context.SENSOR_SERVICE);
         activity = (RunnerMan)getActivity();
         log = new LoggingService(view.getContext(), "SENSORS",null);
-//        accidentLog = new LoggingService(view.getContext(), "SENSORS","incidents");
-
-        username = activity.getUsername();
         userID = activity.getUserID();
-
         allSensors =  mSensorManager.getSensorList(Sensor.TYPE_ALL);
 
         for (Sensor s: allSensors){
             Log.i(SENSOR_SERVICE_TAG,s.getName());
         }
+
         allSensors =  mSensorManager.getSensorList(Sensor.TYPE_ALL);
+
         /*UNCALIBRATED_GYROSCOPE and ROTATION_VECTOR > 4 event values*/
         mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 
@@ -180,7 +177,7 @@ public class SensorDisplayFragment extends Fragment implements SensorEventListen
         }
         return output;
     }
-    double magnitude;
+
     /*Interface method*/
     /*https://developer.android.com/reference/android/hardware/SensorEvent.html - HIGH PASS FILTER FOR GRAVITY*/
     @Override
@@ -247,7 +244,6 @@ public class SensorDisplayFragment extends Fragment implements SensorEventListen
                 if(isAccident(magnitude)){
                     showAccidentScreen();
                     Toast.makeText(activity, "An accident may have occurred.", Toast.LENGTH_SHORT).show();
-//                    accidentLog.writeLog(TAG, output);
                 }
 
                 for (int i = 0; i < filterValues.length; i++){
@@ -255,10 +251,6 @@ public class SensorDisplayFragment extends Fragment implements SensorEventListen
                             String.valueOf(f.format(event.values[i] - gravity[i]) + " ")
                     );
                 }
-
-
-
-
             }else{
                 //Non-accelerometer values; unfiltered - set sensor name and append value
                 for (int i = 0; i < event.values.length; i++){
@@ -267,50 +259,47 @@ public class SensorDisplayFragment extends Fragment implements SensorEventListen
             }
         }
     }
-public void sendAccident(){
-    Location currentLocation;
-    currentLocation = activity.getLocation();
-    if(InitRunner.getInstance().internetAvailable()){
-        try {
-            String stringResponse;
-            JSONObject response = requester.sendAccident("runner",currentLocation.getLatitude(),currentLocation.getLongitude(), new Date(), Integer.parseInt(userID));
-            if (response!=null){
-                stringResponse = response.getString("result");
-                if (stringResponse.toLowerCase().equals("success")){
-                    Toast.makeText(activity, "Accident has been sent and services are notified",
-                            Toast.LENGTH_LONG).show();
-                }else{
-                    Toast.makeText(activity, "Accident could not be sent",
-                            Toast.LENGTH_LONG).show();
+
+    public void sendAccident(){
+        Location currentLocation;
+        currentLocation = activity.getLocation();
+        if(InitRunner.getInstance().internetAvailable()){
+            try {
+                String stringResponse;
+                JSONObject response = requester.sendAccident("runner",currentLocation.getLatitude(),currentLocation.getLongitude(), new Date(), Integer.parseInt(userID));
+                if (response!=null){
+                    stringResponse = response.getString("result");
+                    if (stringResponse.toLowerCase().equals("success")){
+                        Toast.makeText(activity, "Accident has been sent and services are notified",
+                                Toast.LENGTH_LONG).show();
+                    }else{
+                        Toast.makeText(activity, "Accident could not be sent",
+                                Toast.LENGTH_LONG).show();
+                    }
+
                 }
-
+            }catch(IOException e){
+                Log.e(TAG, "Accident report could not be sent, internet may not be available.");
+            }catch(JSONException e){
+                Log.e(TAG, "JSON response object could not be accessed");
             }
-        }catch(IOException e){
-            Log.e(TAG, "Accident report could not be sent, internet may not be available.");
-        }catch(JSONException e){
-            Log.e(TAG, "JSON response object could not be accessed");
+
+        }else{
+            Toast.makeText(activity, getString(R.string.no_internet), Toast.LENGTH_SHORT).show();
         }
-
-    }else{
-        Toast.makeText(activity, getString(R.string.no_internet), Toast.LENGTH_SHORT).show();
     }
-}
-    private void showAccidentScreen(){
 
+    private void showAccidentScreen(){
         activity.showCountDownTimer();
     }
-    public final int THRESHOLD = 15;
-    private boolean isAccident(double magnitude){
-        /*need to determine a proper detection algorithm*/
-        if (magnitude >= THRESHOLD) return true;
 
-        return false;
+    private boolean isAccident(double magnitude){
+        return (magnitude >= THRESHOLD);
     }
     /*Received at the same time as the activity*/
     @Override
     public void onResume() {
         super.onResume();
-        Log.d(TAG,"Fragment onResume");
         for (Sensor s: deviceSensors){
             mSensorManager.registerListener(this, s, SensorManager.SENSOR_DELAY_NORMAL);
         }
@@ -318,13 +307,11 @@ public void sendAccident(){
     }
     @Override
     public void onPause() {
-        Log.d(TAG,"Fragment onPause");
         super.onPause();
     }
     @Override
     public void onDestroyView(){
         log.closeLogFile();
-        Log.d(TAG,"Fragment onDestroyView");
         mSensorManager.unregisterListener(this);
         super.onDestroyView();
     }

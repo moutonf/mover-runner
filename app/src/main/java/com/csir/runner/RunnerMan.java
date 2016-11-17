@@ -64,7 +64,10 @@ public class RunnerMan extends FragmentActivity implements SensorDisplayFragment
     /*Intent Extras*/
 
     private String userID;
-    private String username;
+    boolean start, firstUpdate;
+    double distance, speed;
+    FragmentManager fm;
+    private CountDownTimer timer;
 
     @BindView(R.id.distance_text) TextView mDistanceText;
     @BindView(R.id.latitude_text) TextView mLatitudeText;
@@ -118,15 +121,9 @@ public class RunnerMan extends FragmentActivity implements SensorDisplayFragment
 
         }
 
-
-    public String getUsername(){
-        return username;
-    }
     public String getUserID(){
         return userID;
     }
-    boolean start, firstUpdate;
-    double distance, speed;
 
     public void onSensorFragmentInteraction(Uri uri){
         /*sensor shouldn't require any input from location, unless coordinates*/
@@ -140,7 +137,6 @@ public class RunnerMan extends FragmentActivity implements SensorDisplayFragment
     protected void createLocationRequest() {
         mLocationRequest = new LocationRequest();
         mLocationRequest.setInterval(LOCATION_INTERVAL); //2 seconds
-//        mLocationRequest.setFastestInterval(5000);
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
     }
 
@@ -193,9 +189,8 @@ public class RunnerMan extends FragmentActivity implements SensorDisplayFragment
             firstUpdate = true;
         }
     }
+
     /*The main map display and update method*/
-
-
     public void updateMapLocation(){
         location = new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude());
         //only add a marker if start of the trip
@@ -228,7 +223,6 @@ public class RunnerMan extends FragmentActivity implements SensorDisplayFragment
     }
 
     /*Boring Google Maps methods*/
-
     /**
      * Runs when a GoogleApiClient object successfully connects.
      */
@@ -255,7 +249,6 @@ public class RunnerMan extends FragmentActivity implements SensorDisplayFragment
         Log.i(TAG, "Connection failed: ConnectionResult.getErrorCode() = " + result.getErrorCode());
     }
 
-
     @Override
     public void onConnectionSuspended(int cause) {
         // The connection to Google Play services was lost for some reason. We call connect() to
@@ -272,8 +265,7 @@ public class RunnerMan extends FragmentActivity implements SensorDisplayFragment
 
         createLocationRequest();
     }
-    FragmentManager fm;
-    private CountDownTimer timer;
+
     public void showCountDownTimer(){
         runnerDisplay.setVisibility(LinearLayout.GONE);
         countdownDisplay.setVisibility(LinearLayout.VISIBLE);
@@ -285,13 +277,10 @@ public class RunnerMan extends FragmentActivity implements SensorDisplayFragment
             }
 
             public void onFinish() {
-                //activate the post
-//if you added fragment via layout xml
                 SensorDisplayFragment fragment = (SensorDisplayFragment) fm.findFragmentById(R.id.sensor_display_fragment);
                 fragment.sendAccident();
                 cancelAccident(null);
             }
-
         }.start();
     }
 
@@ -306,14 +295,12 @@ public class RunnerMan extends FragmentActivity implements SensorDisplayFragment
     @Override
     protected void onStart() {
         super.onStart();
-        Log.i(TAG,"RunnerMan onStart");
         /*Location updates are stopped when activity is stopped*/
         mGoogleApiClient.connect();
     }
 
     @Override
     protected void onDestroy(){
-        Log.i(TAG,"RunnerMan onDestroy");
         log.closeLogFile();
         super.onDestroy();
     }
@@ -321,21 +308,16 @@ public class RunnerMan extends FragmentActivity implements SensorDisplayFragment
     @Override
     protected void onStop() {
         super.onStop();
-        Log.i(TAG,"RunnerMan onStop");
-            /*Don't sustain connections*/
         if (mGoogleApiClient.isConnected()) {
             mGoogleApiClient.disconnect();
         }
     }
     @Override
     protected void onPause() {
-        Log.i(TAG,"RunnerMan onPause");
         super.onPause();
-            /*Will drain battery unnecessarily*/
     }
     @Override
     public void onResume() {
-        Log.i(TAG,"RunnerMan onResume");
         super.onResume();
         if (mGoogleApiClient.isConnected() && !mRequestingLocationUpdates) {
             startLocationUpdates();
