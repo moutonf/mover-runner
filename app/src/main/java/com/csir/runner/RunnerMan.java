@@ -72,7 +72,6 @@ public class RunnerMan extends FragmentActivity implements SensorDisplayFragment
     @BindView(R.id.distance_text) TextView mDistanceText;
     @BindView(R.id.latitude_text) TextView mLatitudeText;
     @BindView(R.id.longitude_text) TextView mLongitudeText;
-    @BindView(R.id.speed_text) TextView mSpeedText;
     @BindView(R.id.last_update_time) TextView mLastUpdateTimeText;
     @BindView(R.id.runner_display) LinearLayout runnerDisplay;
     @BindView(R.id.countdown_display) RelativeLayout countdownDisplay;
@@ -170,8 +169,6 @@ public class RunnerMan extends FragmentActivity implements SensorDisplayFragment
                 mCurrentLocation.getLongitude()));
         mLastUpdateTimeText.setText(String.format(deviceLocale,"%s: %s", mUpdateTimeLabel,
                 mLastUpdateTime));
-        mSpeedText.setText(String.format(deviceLocale,"%s: %f", mSpeedLabel,
-                speed));
         mDistanceText.setText(String.format(deviceLocale,"%s: %f", mDistanceLabel,
                 distance));
     }
